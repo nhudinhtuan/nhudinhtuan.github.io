@@ -1,0 +1,134 @@
+
+<!DOCTYPE html>
+<!--
+  Google HTML5 slide template
+  URL: http://code.google.com/p/html5slides/
+-->
+<html>
+  <head>
+    <title>Presentation</title>
+
+    <meta charset='utf-8'>
+    <script src='./html5slides/slides.js'></script>
+
+    <!-- Hand demo -->
+    <script type="text/javascript" src="../lib/jquery.js"></script>
+    <script type="text/javascript" src="../jshg/compatibility.js"></script>
+    <script type="text/javascript" src="../jshg/jshg.js"></script>
+  </head>
+  
+  <style>
+
+  </style>
+
+  <body style='display: none'>
+    <div style="padding-left:63px;">
+      <div id="gestureShown">
+      </div>
+    <div>
+    <section class='slides layout-regular template-default'>
+
+      <!-- Your slides (<article>s) go here. Delete or comment out the
+           slides below. -->
+      <article>
+        <h1>
+          JSHG - Presentation Demo
+        </h1>
+        <p>
+          Javascript Hand Gesture Plugin
+          <br>
+          April, 2014
+        </p>
+      </article>
+      
+      <article>
+        <h3>
+          Introduction
+        </h3>
+        <p>
+          JSHG (Javascript Hand Gesture) is a plugin for integrating hand gesture recognition into your websites or browser-based applications.
+        </p>
+        <p>
+          It is fast, flexible and easy to use.
+        </p>
+        <p>
+          This presentation shows you how to use it in your own apps.
+        </p>
+      </article>
+
+      <article>
+        <h3>
+          Why not try it right now !
+        </h3>
+        <p align="center">
+          <a href="javascript:JSHG.start();">START USING GESTURES</a>
+        </p>
+        <p>
+          <div id="webcamShown" style="width:500" align="center"></div>
+        </p>
+      </article>
+
+      <article class='smaller'>
+        <h3>
+          HOW TO USE
+        </h3>
+        <p>
+          STEP 1: Download and unzip the latest version of JSHG.
+        </p>
+        <p>
+          STEP 2: Look inside the js folder to find
+        </p>
+      </article>
+      
+      <article>
+        <h3>
+          Testing 1
+        </h3>
+      </article>
+
+      <article>
+        <h3>
+          Testing 2
+        </h3>
+      </article>
+
+      <article>
+        <h3>
+          Testing 3
+        </h3>
+      </article>
+
+      <article>
+        <h3>
+          Testing 4
+        </h3>
+      </article>
+
+
+      <article>
+        <h3>
+          Testing 5
+        </h3>
+      </article>
+
+    </section>
+     <script type="text/javascript">
+        var currentGesture = null;
+        var actionMapper = function(gesture) {
+            if (currentGesture != null && currentGesture.isSamePos(gesture)) return;
+            if (gesture.isLeft) {
+                nextSlide();
+            } else if (gesture.isRight) {
+                prevSlide();
+            };
+            currentGesture = gesture;
+        }
+        JSHG.config({
+            "callback": actionMapper, 
+            "learnDivId": "webcamShown",
+            "gestureDivId": "gestureShown",
+            "settings": {"ACTION_RATE": -1, "LEARNING_COUNT_DOWN": 5, "VIDEO_WIDTH": 500, "VIDEO_HEIGHT": 400},
+        });
+    </script> 
+  </body>
+</html>
