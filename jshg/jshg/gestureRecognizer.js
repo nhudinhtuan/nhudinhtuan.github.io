@@ -1,15 +1,23 @@
 importScripts("ParallelJS-CV.min.js");
-CONFIG_REQUEST = "configRequest";
+
+
+/* ------- CONSTANTS ------- */
+// request types
+INIT_REQUEST = "initRequest";
 LEARNING_REQUEST = "learningRequest";
 DETECT_REQUEST = "detectRequest";
+// for learning
+H_BOUND_LEARN = 15;
+S_BOUND_LEARN = 0.15;
+V_BOUND_LEARN = 0.15;
 
-var grabPoints = new Array();
-var learnedColors = new Array();
+/* ------- GLOBAL VARIABLES ------- */
+var learnedColors = [];
 var debugMode = false;
-jscv.USE_JS_ARRAY_FLAG_ = true;
+var responseScale = [1, 1];
 
 function detect(frame) {
-    var response = {"handPos": [-1, -1], "nFingers": -1, "fingers": [], "debug": null};
+    var response = {"handPos": [-1, -1], "nFingers": -1, "fingers": [], "threshImage": null, "debug": null};
     if (frame == null || learnedColors.length == 0)
         return response;
 
@@ -92,8 +100,12 @@ function detect(frame) {
     response.nFingers = fingers.length;
     response.fingers = fingers;
 
+
+    var responseThreshImage = jscv.imgproc.resizeMult(secondThreshImage, responseScale[0], responseScale[1]);
+    response.threshImage = responseThreshImage.data.data;
+
     if (debugMode == true) {
-        response.debug = {"threshImage": secondThreshImage.data.data, "contour" : null, "hullLines": hullLines, "defectLines": defectLines}
+        response.debug = {"contour" : null, "hullLines": hullLines, "defectLines": defectLines}
 
         /*
         var maxContour = contours[maxIndex];
@@ -110,13 +122,16 @@ function detect(frame) {
     return response;
 }
 
-function learn(learningPoints, frame) {
-    var hBound = 20;
-    var sBound = 0.1;
-    var vBound = 0.1;
+function learnFrame(learningPoints, frame) {
+    var hBound = H_BOUND_LEARN;
+    var sBound = S_BOUND_LEARN;
+    var vBound = V_BOUND_LEARN;
 
     var jscvImage = new jscv.coredt.Image(frame.width, frame.height, jscv.uint8Clamped, frame.data.buffer);
     var hsvImage = jscv.imgproc.convertColor(jscvImage, jscv.COLOR_HSV);
+    learnedColors = new Array(learningPoints.length);
+
+    var response = new Array(learningPoints.length);
     for (var i = 0; i < learningPoints.length; ++i) {
         var px = parseInt(learningPoints[i][0]);
         var py = parseInt(learningPoints[i][1]);
@@ -124,26 +139,47 @@ function learn(learningPoints, frame) {
         var h = hsvImage.data.get(py, px, 0);
         var s = hsvImage.data.get(py, px, 1);
         var v = hsvImage.data.get(py, px, 2);
-        learnedColors.push(new jscv.imgproc.Bound(h-hBound, h+hBound, 
+        response[i] = [h, s, v];
+        learnedColors[i] = new jscv.imgproc.Bound(h-hBound, h+hBound, 
                                               s-sBound, s+sBound, 
-                                              v-vBound, v+vBound));
+                                              v-vBound, v+vBound);
+    }
+
+    return response;
+}
+
+function learnColor(hsvArr) {
+    var hBound = H_BOUND_LEARN;
+    var sBound = S_BOUND_LEARN;
+    var vBound = V_BOUND_LEARN;
+
+    learnedColors = new Array(hsvArr.length);
+    var h, s, v;
+    for (var i = 0; i < hsvArr.length; ++i) {
+        h = hsvArr[i][0];
+        s = hsvArr[i][1];
+        v = hsvArr[i][2]; 
+        learnedColors[i] = new jscv.imgproc.Bound(h-hBound, h+hBound, 
+                                              s-sBound, s+sBound, 
+                                              v-vBound, v+vBound);        
     }
 }
 
-function config(data) {
+function init(data) {
     debugMode = data.debugMode;
+    responseScale = data.responseScale;
+    learnColor(data.learnedHSV);
 
-    console.log("worker config");
-    console.log(data);
+    jscv.USE_JS_ARRAY_FLAG_ = true;
 }
 
 self.addEventListener('message', function(e) {
     var receivedData = e.data;
     var response = null;
-    if (receivedData.type == CONFIG_REQUEST) {
-        config(receivedData.config);
+    if (receivedData.type == INIT_REQUEST) {
+        init(receivedData.config);
     } else if (receivedData.type == LEARNING_REQUEST) {
-        learn(receivedData.learningPoints, receivedData.frame);
+        response = learnFrame(receivedData.learningPoints, receivedData.frame);
     } else {
         response = detect(receivedData.frame);
     }

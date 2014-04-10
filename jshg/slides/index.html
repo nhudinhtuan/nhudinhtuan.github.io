@@ -18,15 +18,144 @@
   </head>
   
   <style>
-
+.button, .button span {
+    display: inline-block;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+.button {
+    white-space: nowrap;
+    line-height:1em;
+    position:relative;
+    outline: none;
+    overflow: visible; /* removes extra side padding in IE */
+    cursor: pointer;
+    border: 1px solid #999;/* IE */
+    border: rgba(0, 0, 0, .2) 1px solid;/* Saf4+, Chrome, FF3.6 */
+    border-bottom:rgba(0, 0, 0, .4) 1px solid;
+    -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.2);
+    -moz-box-shadow: 0 1px 2px rgba(0,0,0,.2);
+    box-shadow: 0 1px 2px rgba(0,0,0,.2);
+    background: -moz-linear-gradient(
+        center top,
+        rgba(255, 255, 255, .1) 0%,
+        rgba(0, 0, 0, .1) 100%
+    );/* FF3.6 */
+    background: -webkit-gradient(
+        linear,
+        center bottom,
+        center top,
+        from(rgba(0, 0, 0, .1)),
+        to(rgba(255, 255, 255, .1))
+    );/* Saf4+, Chrome */
+    filter:  progid:DXImageTransform.Microsoft.gradient(startColorStr='#19FFFFFF', EndColorStr='#19000000'); /* IE6,IE7 */
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#19FFFFFF', EndColorStr='#19000000')"; /* IE8 */
+    -moz-user-select: none;
+    -webkit-user-select:none;
+    -khtml-user-select: none;
+    user-select: none;
+    margin-bottom:10px;
+}
+.button.full, .button.full span {
+    display: block;
+}
+.button:hover, .button.hover {
+    background: -moz-linear-gradient(
+        center top,
+        rgba(255, 255, 255, .2) 0%,
+        rgba(255, 255, 255, .1) 100%
+    );/* FF3.6 */
+    background: -webkit-gradient(
+        linear,
+        center bottom,
+        center top,
+        from(rgba(255, 255, 255, .1)),
+        to(rgba(255, 255, 255, .2))
+    );/* Saf4+, Chrome */
+    filter:  progid:DXImageTransform.Microsoft.gradient(startColorStr='#33FFFFFF', EndColorStr='#19FFFFFF'); /* IE6,IE7 */
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#33FFFFFF', EndColorStr='#19FFFFFF')"; /* IE8 */
+}
+.button:active, .button.active {
+    top:1px;
+}
+.button span {
+    position: relative;
+    color:#fff;
+    text-shadow:0 1px 1px rgba(0, 0, 0, 0.25);
+    border-top: rgba(255, 255, 255, .2) 1px solid;
+    padding:0.6em 1.3em;
+    line-height:1em;
+    text-decoration:none;
+    text-align:center;
+    white-space: nowrap;
+}
+.button.small span {
+    font-size:12px;
+}
+.button.medium span {
+    font-size:14px;
+}
+.button.large span {
+    font-size:18px;
+}
+.button.black {
+    background-color: #333333;
+}
+.button.gray {
+    background-color: #666666;
+}
+.button.white {
+    background-color: #FFFFFF;
+}
+.button.white span{
+    color: #666666;
+}
+.button.red {
+    background-color: #e62727;
+}
+.button.orange {
+    background-color: #ff5c00;
+}
+.button.magenta {
+    background-color: #A9014B;
+}
+.button.yellow {
+    background-color: #ffb515;
+}
+.button.blue {
+    background-color: #00ADEE;
+}
+.button.pink {
+    background-color: #e22092;
+}
+.button.green {
+    background-color: #91bd09;
+}
+.button.rosy {
+    background-color: #F16C7C;
+}
+.button.brown {
+    background-color: #804000;
+}
+.button.purple {
+    background-color: #800080;
+}
+.button.cyan {
+    background-color: #46C7C7;
+}
+.button.gold {
+    background-color: #D4A017;
+}
   </style>
 
   <body style='display: none'>
-    <div style="padding-left:63px;">
+    <div style="padding-left:74px; padding-top:10px; width:80px; z-index:2000">
       <div id="gestureShown">
       </div>
-      <button onClick="JSHG.stop()">STOP</button>
-    <div>
+      <p align="center" style="margin-top:0px; margin-left:12px"><a href="javascript:JSHGToggle()" class="button small blue"><span>START</span></a></p>
+    </div>
     <section class='slides layout-regular template-default'>
 
       <!-- Your slides (<article>s) go here. Delete or comment out the
@@ -115,6 +244,11 @@
     </section>
      <script type="text/javascript">
         var currentGesture = null;
+
+        function JSHGToggle() {
+            if (JSHG.isRunning) JSHG.stop();
+            JSHG.start();
+        }
         var actionMapper = function(gesture) {
             if (currentGesture != null && currentGesture.isSamePos(gesture)) return;
             if (gesture.isLeft) {
@@ -122,13 +256,16 @@
             } else if (gesture.isRight) {
                 prevSlide();
             };
+            if (currentGesture != null && currentGesture.nFingers > 3 && gesture.nFingers < 3) {
+                JSHG.stop();
+            }
             currentGesture = gesture;
         }
         JSHG.config({
             "callback": actionMapper, 
             "learnDivId": "webcamShown",
             "gestureDivId": "gestureShown",
-            "settings": {"ACTION_RATE": -1, "LEARNING_COUNT_DOWN": 5, "VIDEO_WIDTH": 500, "VIDEO_HEIGHT": 400},
+            "settings": {"ACTION_RATE": -1, "LEARNING_COUNT_DOWN": 5, "VIDEO_WIDTH": 500, "VIDEO_HEIGHT": 400, "GESTURE_WIDTH": 100, "GESTURE_HEIGHT": 80},
         });
     </script> 
   </body>
