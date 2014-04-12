@@ -79,13 +79,13 @@
                         <h3>Step 1 - Load JSHG files.</h3>
                         <ol>
                             <li>Download and unzip the latest version of JSHG.</li>
-                            <li>Look inside the <code>jshg</code> folder to find <code>jquery.js</code>, <code>compatibility.js</code>, <code>jshg.js</code> and load all of them. You can replace <code>jquery.js</code> by your own jQuery library. All the files must be loaded in the following order:
-<pre><code>&lt;script src=&quot;jshg/jquery.js&quot;&gt;&lt;/script&gt;
+                            <li>Look inside the <code>jshg</code> folder to find <code>jquery-1.11.0.min.js</code>, <code>compatibility.js</code>, <code>jshg.js</code> and load all of them. You can replace <code>jquery-1.11.0.min.js</code> by your own jQuery library (but it must be jQuery v1.6 or later). All the files must be loaded in the following order:
+<pre><code>&lt;script src=&quot;jshg/jquery-1.11.0.min.js&quot;&gt;&lt;/script&gt;
 &lt;script src=&quot;jshg/compatibility.js&quot;&gt;&lt;/script&gt;
 &lt;script src=&quot;jshg/jshg.js&quot;&gt;&lt;/script&gt;</code></pre>
                             </li>
                         </ol>
-                        <h3>Step 2 - Config JSHG</h3>
+                        <h3>Step 2 - Initialize JSHG</h3>
                         <ol>
                             <li>Define a function to map the gesture returning from JSHG with your expected actions</li>
 <pre><code>var actionMapper = function(gesture) {
@@ -96,20 +96,28 @@
 More details about the <code>gesture</code> object can be found at the <a href="./reference.html#gesture">reference</a> page.                        
                             <li>Optional: add a <code>div</code> to display the gesture images.</li>
 <pre><code>&lt;div id=&quot;gestureShownHere&quot;&gt;&lt;/div&gt;</code></pre>
-                            <li>Config JSHG</li>                           
-<pre><code>JSHG.config({
+                            <li>Init JSHG</li>                           
+<pre><code>JSHG.init({
     "actionCallback": actionMapper, 
     "learnDivId": "gestureShownHere",
     "gestureDivId": "gestureShownHere",
-    "settings": {"VIDEO_WIDTH": 500, "VIDEO_HEIGHT": 400, "GESTURE_WIDTH": 100, "GESTURE_HEIGHT": 80},
+    "settings": {
+        "cameraWidth": 500, 
+        "cameraHeight": 400, 
+        "gestureDisplayWidth": 100, 
+        "gestureDisplayHeight": 80
+    },
 });</code></pre>
 More details about the <code>settings</code> options can be found at the <a href="./reference.html#settings">reference</a> page.                      
                         </ol>
                         <h3>Step 3 - Turn it on</h3>
                         At this time, JSHG is ready to use.
-<pre><code>JSHG.start()</code></pre>
-                        To improve the accuracy of hand gesture recognition, you may want JSHG to learn the skin color before running. You can easily do that by using the following function instead of <code>JSHG.start()</code>
-<pre><code>JSHG.learn()</code></pre>                        
+<pre><code>JSHG.run()
+// JSHG.stop(); -- for stopping
+</code></pre>
+                        To improve the accuracy of hand gesture recognition, you may want JSHG to learn the skin color before running. You can easily do that by using the following function instead of <code>JSHG.run()</code>
+<pre><code>JSHG.learnSkinColor()</code></pre>
+                        <p>More details about the API are available at <a href="./reference.html#api">reference</a> page.                     
                     </div>
                 </section>
             </div>
@@ -128,9 +136,35 @@ More details about the <code>settings</code> options can be found at the <a href
 
                     <div class="post-description">
                         <p>
-                            In this example, we integrate JSHG with <a href="https://code.google.com/p/html5slides/">Google HTML5 slide template</a>. This allows you to create a wonderful presentation by controlling the slides by your hand gestures via webcam.<br>
-                            Two basic gestures are used: moving hand to the right moves the slide forward and moving hand to the left moves it backward.
+                            In this example, we integrate JSHG with <a href="https://code.google.com/p/html5slides/">Google HTML5 slide template</a>. This allows you to create a wonderful presentation by controlling the slides by your hand gestures via webcam. Two basic gestures are used: moving hand to the right moves the slide forward and moving hand to the left moves it backward.
                         </p>
+                        The integrated code is simple as the following:
+<pre><code>var currentGesture = null;
+var finishLearning = function() {
+    $("#startInstruction").show();
+}
+var actionMapper = function(gesture) {
+    if (currentGesture != null && currentGesture.isSameRelativePos(gesture)) return;
+    if (gesture.isLeft) {
+        nextSlide();
+    } else if (gesture.isRight) {
+        prevSlide();
+    };
+    currentGesture = gesture;
+}
+JSHG.init({
+    "actionCallback": actionMapper, 
+    "learnCallback": finishLearning,
+    "learnDivId": "learningShownHere",
+    "gestureDivId": "gestureShownHere",
+    "settings": {
+        "learningCountDown_": 10, 
+        "cameraWidth": 500, 
+        "cameraHeight": 400, 
+        "gestureDisplayWidth": 100, 
+        "gestureDisplayHeight": 80
+    },
+});</code></pre>
                     </div>
                 </section>
 

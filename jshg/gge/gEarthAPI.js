@@ -1,7 +1,7 @@
 google.load("earth", "1");
 
 var ge = null;
-var ALTITUDE_NORMALIZER = 5000000.0
+var ALTITUDE_NORMALIZER = 8000000.0
 var panSpeed;
 
 function init() {

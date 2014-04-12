@@ -2,7 +2,7 @@ var controlsCanvas = null;
 function learnSkin() {
     $("#map3d").hide();
     $("#learningShownHere").show();
-    JSHG.learn();
+    JSHG.learnSkinColor();
 
     $("#rightPanel").hide();
     // toggle start button
@@ -16,13 +16,13 @@ function learnSkin() {
 function JSHGToggle(toggleBut) {
     toggleBut.removeClass("button-stop");
     toggleBut.removeClass("button-start");
-    if (JSHG.isRunning) {
+    if (JSHG.isRunning()) {
         JSHG.stop();
         toggleBut.addClass("button-start");
         toggleBut.html("START JSHG");
         $("#rightPanel").hide();
     } else {
-        JSHG.start();
+        JSHG.run();
         toggleBut.addClass("button-stop");
         toggleBut.html("STOP JSHG");  
         $("#rightPanel").show();          
@@ -35,7 +35,7 @@ function drawControlsCanvas(mode, handPos) {
     var w = controlsCanvas.width();
     var h = controlsCanvas.height();
     var ctx = controlsCanvas[0].getContext('2d');
-    var centralRatio = JSHG.SETTINGS["CENTRAL_AREA_RATIO"];
+    var centralRatio = JSHG.settings_["centralAreaRatio"];
 
     // draw white background
     ctx.fillStyle = "#FFFFFF";

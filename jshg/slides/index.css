@@ -1,0 +1,49 @@
+.button-jshg {
+  color: white;
+  border-radius: 4px;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+  text-decoration: none !important;
+  font-size: 12px;
+}
+.button-jshg:hover { 
+  color: white;
+}
+.button-start {
+  background: rgb(66, 184, 221);      
+}
+.button-start:hover {
+  background: rgb(223, 117, 20);
+}
+.button-stop {
+  background: rgb(223, 117, 20);  
+}
+.button-stop:hover {
+  background: rgb(66, 184, 221);    
+}
+
+.button-red {
+  color: white !important;
+  border-radius: 4px;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+  text-decoration: none !important;
+  font-size: 12px;
+  background: rgb(202, 60, 60);
+}
+
+.button-red:hover {
+  color: white;
+  background: rgb(180, 60, 60);
+}      
+
+.gesture-div {
+  margin-top: 13px; 
+  margin-left:74px; 
+  width:80px;
+  position: absolute;
+  z-index: 3000;
+}
+.learning-div {
+  padding-top: 25px;
+  width:500;
+  text-align: center;
+}

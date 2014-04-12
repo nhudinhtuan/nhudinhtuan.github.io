@@ -32,7 +32,7 @@
         <div class="header">
             <hgroup>
                 <h1 class="brand-title">JSHG</h1>
-                <h2 class="brand-tagline">Control your website by hand gesture via webcam.</h2>
+                <h2 class="brand-tagline">Control your web applications with hand gestures via webcam.</h2>
             </hgroup>
 
             <nav class="nav">
@@ -57,15 +57,118 @@
                 <h1 class="content-subhead">REFERENCE</h1>
                 <section class="post">
                     <header class="post-header">
-                        <h2 class="post-title"><a name="gesture">Gesture Object</a></h2>
+                        <h2 class="post-title"><a name="api">Public API</a></h2>
+                    </header>
+
+                    <div class="post-description">
+                        <p>
+                            JSHG provides the following functions for you to integrate it with your applications: 
+                        </p>
+                        <p><span style="font-size:20px"><b>1. JSHG.init()</b></span><br>
+                        <em>Description</em>: This function must be called before running JSHG. It initializes all necessary components, variables for JSHG and creates a secondary thread to detect hand gestures from the frames of web camera.<br>
+                        <em>Parameters</em>: It requires a javascript object as a parameter. That object contains following properties:
+                        <table class="pure-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Type</th>
+                                    <th>Required</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="pure-table-odd">
+                                    <td>actionCallback</td>
+                                    <td>function</td>
+                                    <td>yes</td>
+                                    <td>the function JSHG will call to pass a HandGesture object detected from web camera frames. More details about the HandGesture object can be found at <a href="#gesture">here</a>.</td>
+                                </tr>
+                                <tr>
+                                    <td>learnCallback</td>
+                                    <td>function</td>
+                                    <td>no</td>
+                                    <td>the function JSHG will call when it finishes the learning process. No argument is passed to this function.</td>
+                                </tr>
+                                <tr class="pure-table-odd">
+                                    <td>learnDivId</td>
+                                    <td>string</td>
+                                    <td>no</td>
+                                    <td>the id of a <code>&lt;div&gt;</code> on DOM where you want JSHG shows web camera video to learn skin color from users.</td>
+                                </tr>
+                                <tr>
+                                    <td>settings</td>
+                                    <td>Object</td>
+                                    <td>no</td>
+                                    <td>you can customize JSHG by passing an object to this parameter. The available options are mentioned at <a href="#settings">here</a>.</td>
+                                    </td>
+                                </tr>
+                                <tr class="pure-table-odd">
+                                    <td>workerConfig</td>
+                                    <td>Object</td>
+                                    <td>no</td>
+                                    <td>This parameter should be used by advanced users. If you create your own worker to detect hand gestures, you can pass configs to the worker by this parameter. JSHG uses JSCV library by default. Only one property is available. It is "parallelMode", accepts "true" or "false".</td>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <em>Example</em>
+<pre><code>&lt;div id="gestureShownHere"&gt;&lt;/div&gt;
+&lt;script&gt;
+var actionMapper = function(gesture) {
+    if (gesture.isLeft) 
+        console.log("Hey, your hand is on the left side");
+    ...
+}
+JSHG.init({
+    "actionCallback": actionMapper, 
+    "learnDivId": "gestureShownHere",
+    "gestureDivId": "gestureShownHere",
+    "settings": {
+        "cameraWidth": 500, 
+        "cameraHeight": 400, 
+        "gestureDisplayWidth": 100, 
+        "gestureDisplayHeight": 80
+    },
+});
+&lt;/script&gt;</code></pre>
+                        </p>
+
+                        <p><span style="font-size:20px"><b>2. JSHG.run()</b></span><br>
+                        <em>Description</em>: this function is called to start JSHG. It starts reading the web camera frame and process the image data.<br>
+                        <em>Precondition</em>: JSHG.init() must be called before calling this function.
+                        </p>
+
+                        <p><span style="font-size:20px"><b>3. JSHG.learnSkinColor()</b></span><br>
+                        <em>Description</em>: This function is to start the learning process. After the learning process, JSHG.run() is called automatically and the learned colors are saved into localStorage.<br>
+                        <em>Precondition</em>: JSHG.init() must be called before calling this function.
+                        </p>
+
+                        <p><span style="font-size:20px"><b>4. JSHG.stop()</b></span><br>
+                        <em>Description</em>: This function is to stop JSHG. It does not release any resources. It just pauses the camera video and remain the status of KSHG<br>
+                        <em>Precondition</em>: JSHG.run() or JSHG.learnSkinColor() must be called before calling this function.
+                        </p>
+
+                        <p><span style="font-size:20px"><b>5. JSHG.delete()</b></span><br>
+                        <em>Description</em>: This function releases all resources. After calling this function, JSHG.init() must be called before JSHG can be used.<br>
+                        </p>
+
+                        <p><span style="font-size:20px"><b>6. JSHG.isRunning()</b></span><br>
+                        <em>Description</em>: it returns true if JSHG is running; otherwise, returns false.<br>
+                        </p>
+                    </div>
+                </section>
+
+
+                <section class="post">
+                    <header class="post-header">
+                        <h2 class="post-title"><a name="gesture">HandGesture Object</a></h2>
                     </header>
                     <div class="post-description">
-                        <p>A gesture object is passed to the action mapper whenever JSHG sucessfully detects hand gesture. This object contains following attributes and methods.</p>
+                        <p>JSHG pass a HandGesture object to the "actionCallback" function when calling it. The attributes and methods of HandGesture class are available at below  </p>
 
                         <table class="pure-table">
                             <thead>
                                 <tr>
-                                    <th>#</th>
                                     <th>Name</th>
                                     <th>Type</th>
                                     <th>Description</th>
@@ -74,51 +177,54 @@
 
                             <tbody>
                                 <tr class="pure-table-odd">
-                                    <td>1</td>
                                     <td>isLeft</td>
                                     <td>boolean</td>
-                                    <td></td>
+                                    <td>It is true when the position of hand is on the left side of bounding line.</td>
                                 </tr>
-
                                 <tr>
-                                    <td>2</td>
                                     <td>isRight</td>
                                     <td>boolean</td>
-                                    <td></td>
+                                    <td>It is true when the position of hand is on the right side of bounding line.</td>
                                 </tr>
-
                                 <tr class="pure-table-odd">
-                                    <td>3</td>
                                     <td>isUp</td>
                                     <td>boolean</td>
-                                    <td></td>
+                                    <td>It is true when the position of hand is above the bounding line.</td>
                                 </tr>
-
                                 <tr>
-                                    <td>4</td>
                                     <td>isDown</td>
                                     <td>boolean</td>
-                                    <td></td>
+                                    <td>It is true when the position of hand is below the bounding line.</td>
                                 </tr>
-
                                 <tr class="pure-table-odd">
-                                    <td>5</td>
                                     <td>nFingers</td>
                                     <td>number</td>
-                                    <td></td>
+                                    <td>the number of fingers JSHG detected.</td>
                                 </tr>
-
                                 <tr>
-                                    <td>6</td>
                                     <td>handPos</td>
                                     <td>[number, number]</td>
-                                    <td></td>
+                                    <td>the position of hand</td>
                                 </tr>
                                 <tr class="pure-table-odd">
-                                    <td>5</td>
-                                    <td>equals(gesture)</td>
-                                    <td></td>
-                                    <td></td>
+                                    <td>equals(other)</td>
+                                    <td>function</td>
+                                    <td>return true if two HandGesture objects have the same attributes.</td>
+                                </tr>
+                                <tr>
+                                    <td>isSameRelativePos(other)</td>
+                                    <td>function</td>
+                                    <td>return true if two HandGesture objects have the same isLeft, isRight, isUp, isDown values.</td>
+                                </tr>
+                                <tr class="pure-table-odd">
+                                    <td>isSameAbsolutePos(other)</td>
+                                    <td>function</td>
+                                    <td>return true if two HandGesture objects have the same handPos value.</td>
+                                </tr>
+                                <tr>
+                                    <td>isSameNFingers(other)</td>
+                                    <td>function</td>
+                                    <td>return true if two HandGesture objects have the same nFingers value.</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -129,28 +235,100 @@
 
                 <section class="post">
                     <header class="post-header">
-                        <h2 class="post-title">Public API</h2>
+                        <h2 class="post-title"><a name="settings">Settings options</a></h2>
                     </header>
 
                     <div class="post-description">
-                        <p>
-                            .......
-                        </p>
+                        <p>User can customize JSHG by passing an object to <code>JSHG.init()</code>. The following options are available:</p>
+                        <table class="pure-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="pure-table-odd">
+                                    <td>cameraWidth</td>
+                                    <td>number</td>
+                                    <td>the width of web carema frame. This number affects the performance of JSHG. If it is big, it may detect hand gesture more accurately but JSHG takes more time to process a frame. It is good to keep it at the default value if you do not have computer vision background.</td>
+                                </tr>
+                                <tr>
+                                    <td>cameraHeight</td>
+                                    <td>number</td>
+                                    <td>the height of web carema frame. This number affects the performance of JSHG. If it is big, it may detect hand gesture more accurately but JSHG takes more time to process a frame. It is good to keep it at the default value if you do not have computer vision background.</td>
+                                </tr>
+                                <tr class="pure-table-odd">
+                                    <td>gestureDisplayWidth</td>
+                                    <td>number</td>
+                                    <td>the width of gesture output frame. It should be smaller than cameraWidth.</td>
+                                </tr>
+                               <tr>
+                                    <td>gestureDisplayHeight</td>
+                                    <td>number</td>
+                                    <td>the width of gesture output frame. It should be smaller than cameraHeight.</td>
+                                </tr>
+                               <tr class="pure-table-odd">
+                                    <td>actionRate</td>
+                                    <td>number</td>
+                                    <td>this number tells JSHG how many times it should call <em>actionCallback</em> function per second. Set it -1 if you want JSHG to call <em>actionCallback</em> function whenever it finishs processing a frame.</td>
+                                </tr>
+                                <tr>
+                                    <td>learningCountDown</td>
+                                    <td>number</td>
+                                    <td>How many seconds JSHG should wait for users in the learning process.</td>
+                                </tr>    
+                                <tr class="pure-table-odd">
+                                    <td>learningPoints</td>
+                                    <td>2D array</td>
+                                    <td>List of points where do you want to get the skin colors. It is 2D array of pixel points (col, row), for example [[100,120], [130,200]]. </td>
+                                </tr>
+                                <tr>
+                                    <td>skinColors</td>
+                                    <td>2D array</td>
+                                    <td>If you have the skin colors in HSV space, you can pass them to here. For example, [[200, 0.7, 0.5], [280, 1.1, 0.9]]</td>
+                                </tr>
+                                <tr class="pure-table-odd">
+                                    <td>colorLearningPoints</td>
+                                    <td>string</td>
+                                    <td>the color of points which are shown on the screen to get the skin color during the learning process.</td>
+                                </tr>
+                                <tr>
+                                    <td>colorHandPos</td>
+                                    <td>string</td>
+                                    <td>the color of point representing the position of hand on the gesture output frame.</td>
+                                </tr>    
+                                <tr class="pure-table-odd">
+                                    <td>colorFingerPos</td>
+                                    <td>string</td>
+                                    <td>the color of points representing the position of fingers on the gesture output frame.</td>
+                                </tr>    
+                                <tr>
+                                    <td>colorBoundingLines</td>
+                                    <td>string</td>
+                                    <td>There are four dot lines on the gesture output to show the left, right, top, down areas. The color for these lines can be set at here.</td>
+                                </tr> 
+                                <tr class="pure-table-odd">
+                                    <td>workerFilePath</td>
+                                    <td>string</td>
+                                    <td>If you want to create your own worker to track hand, this is the place your put your file path.</td>
+                                </tr>                
+                                </tbody>
+                            </table>
                     </div>
                 </section>
 
+                <!--
                 <section class="post">
                     <header class="post-header">
-                        <h2 class="post-title">Config Attributes</h2>
+                        <h2 class="post-title">Write your own worker</h2>
                     </header>
-
                     <div class="post-description">
-                        <p>
-                            .......
-                        </p>
+                        <p></p>
                     </div>
                 </section>
-
+                -->
             </div>
 
      

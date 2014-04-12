@@ -10,7 +10,7 @@
     <title>Gesture-driven Google Earth</title>
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script type="text/javascript" src="./gEarthAPI.js"></script>
-    <script type="text/javascript" src="../jshg/jquery.js"></script>
+    <script type="text/javascript" src="../jshg/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="../jshg/compatibility.js"></script>
     <script type="text/javascript" src="../jshg/jshg.js"></script>
     <script type="text/javascript" src="./index.js"></script>
@@ -65,9 +65,9 @@
                 // zoom mode
                 drawControlsCanvas(2, gesture.handPos);
                 if (gesture.isLeft && !gesture.isUp && !gesture.isDown) {
-                    zoomIn();
-                } else if (gesture.isRight && !gesture.isUp && !gesture.isDown) {
                     zoomOut();
+                } else if (gesture.isRight && !gesture.isUp && !gesture.isDown) {
+                    zoomIn();
                 } else if (gesture.isUp && !gesture.isLeft && !gesture.isRight) {
                     //
                 } else if (gesture.isDown && !gesture.isLeft && !gesture.isRight) {
@@ -92,12 +92,19 @@
           $("#rightPanel").show();
           $("#learningShownHere").hide();
         }
-        JSHG.config({
+        JSHG.init({
             "actionCallback": actionMapper, 
             "learnCallback": finishLearning,
             "learnDivId": "learningShownHere",
             "gestureDivId": "gestureShownHere",
-            "settings": {"ACTION_RATE": -1, "LEARNING_COUNT_DOWN": 10, "VIDEO_WIDTH": 480, "VIDEO_HEIGHT": 400, "GESTURE_WIDTH": 240, "GESTURE_HEIGHT": 200},
+            "settings": {
+              "actionRate": 24, 
+              "learningCountDown": 10, 
+              "cameraWidth": 480, 
+              "cameraHeight": 400, 
+              "gestureDisplayWidth": 240, 
+              "gestureDisplayHeight": 200
+            },
         });
         $(window).unload(function() {
            JSHG.stop();

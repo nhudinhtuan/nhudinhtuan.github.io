@@ -12,63 +12,13 @@
     <script src='./html5slides/slides.js'></script>
 
     <!-- Hand demo -->
-    <script type="text/javascript" src="../jshg/jquery.js"></script>
+    <script type="text/javascript" src="../jshg/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="../jshg/compatibility.js"></script>
     <script type="text/javascript" src="../jshg/jshg.js"></script>
 
     <!-- Styles -->
     <link rel="stylesheet" href="../css/pure-min.css">
-    <style>
-      .button-jshg {
-        color: white;
-        border-radius: 4px;
-        text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
-        text-decoration: none !important;
-        font-size: 12px;
-      }
-      .button-jshg:hover { 
-        color: white;
-      }
-      .button-start {
-        background: rgb(66, 184, 221);      
-      }
-      .button-start:hover {
-        background: rgb(223, 117, 20);
-      }
-      .button-stop {
-        background: rgb(223, 117, 20);  
-      }
-      .button-stop:hover {
-        background: rgb(66, 184, 221);    
-      }
-
-      .button-red {
-        color: white !important;
-        border-radius: 4px;
-        text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
-        text-decoration: none !important;
-        font-size: 12px;
-        background: rgb(202, 60, 60);
-      }
-
-      .button-red:hover {
-        color: white;
-        background: rgb(180, 60, 60);
-      }      
-
-      .gesture-div {
-        margin-top: 13px; 
-        margin-left:74px; 
-        width:80px;
-        position: absolute;
-        z-index: 3000;
-      }
-      .learning-div {
-        padding-top: 25px;
-        width:500;
-        text-align: center;
-      }
-    </style>
+    <link rel="stylesheet" href="./index.css">
   </head>
   
   <body style="display:none">
@@ -142,30 +92,31 @@
         </p>
         <ul>
           <li>Step 1 : Load JSHG files</li>
-          <li>Step 2 : Config JSHG</li>
+          <li>Step 2 : Initialize JSHG</li>
           <li>Step 3 : Turn it on</li>
         <ul>
       </article>
 
-      <article>
+      <article >
         <h3>
           STEP 1 - LOAD JSHG FILES
         </h3>
         <section>
         <pre>
 /*          
- Look inside the jshg folder to find jquery.js, compatibility.js, jshg.js and load all of them in the following order
+ Look inside the jshg folder to find jquery-1.11.0.min.js, compatibility.js, jshg.js and load all of them in the following order
 */
-&lt;script src=&quot;jshg/jquery.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;jshg/jquery-1.11.0.min.js&quot;&gt;&lt;/script&gt;
 &lt;script src=&quot;jshg/compatibility.js&quot;&gt;&lt;/script&gt;
 &lt;script src=&quot;jshg/jshg.js&quot;&gt;&lt;/script&gt;
 </pre>
-        </section>        
+        </section>
+        <p style="font-size:20px"><em>Note: It requires jQuery v1.6 or later. You can load your own Jquery file.</em></p>
       </article>
 
       <article>
         <h3>
-          STEP 2 - CONFIG JSHG
+          STEP 2 - Initialize JSHG
         </h3>
         <section>
         <pre>
@@ -177,8 +128,8 @@
         console.log("Hey, your hand is on the left side");
     ...
   }
-  // Config JSHG
-  JSHG.config({
+  // Init JSHG
+  JSHG.init({
     "actionCallback": actionMapper
   });
 &lt;/script&gt;</pre>
@@ -193,21 +144,22 @@
         <section>
         <pre>
 &lt;script type='text/javascript'&gt;
-JSHG.start();
+JSHG.run();
+// JSHG.stop(); -- for stopping
 &lt;/script&gt;</pre>
         </section>
-        <p>You may want to let it learn the skin color before staring. To do that, use the following function instead of start()</p>
+        <p>You may want to let it learn the skin color before staring. To do that, use the following function instead of run()</p>
         <section>
         <pre>
 &lt;script type='text/javascript'&gt;
-JSHG.learn();
+JSHG.learnSkinColor();
 &lt;/script&gt;</pre>
-        </section>        
+        </section>       
       </article>
 
       <article>
         <h3>
-          THAT'S - YOU GET JSHG IN YOUR WEB APPLICATION
+          THAT IS ALL TO GET JSHG IN YOUR WEB APPLICATION
         </h3>
         <p align="center">
           <img src='be_happy.jpg'><br>
@@ -245,7 +197,7 @@ JSHG.learn();
         function JSHGToggle(toggleBut) {
             toggleBut.removeClass("button-stop");
             toggleBut.removeClass("button-start");
-            if (JSHG.isRunning) {
+            if (JSHG.isRunning()) {
               JSHG.stop();
               toggleBut.addClass("button-start");
               toggleBut.html("START JSHG");
@@ -253,10 +205,10 @@ JSHG.learn();
               if (firstTime) {
                 curSlide = 1;
                 updateSlides();
-                JSHG.learn();
+                JSHG.learnSkinColor();
                 $("#startInstruction").hide();
               } else {
-                JSHG.start();
+                JSHG.run();
               }
               toggleBut.addClass("button-stop");
               toggleBut.html("STOP JSHG");
@@ -269,7 +221,7 @@ JSHG.learn();
         }
 
         var actionMapper = function(gesture) {
-            if (currentGesture != null && currentGesture.isSamePos(gesture)) return;
+            if (currentGesture != null && currentGesture.isSameRelativePos(gesture)) return;
             if (gesture.isLeft) {
                 nextSlide();
             } else if (gesture.isRight) {
@@ -277,14 +229,18 @@ JSHG.learn();
             };
             currentGesture = gesture;
         }
-        $(window).load(function() {
-            JSHG.config({
-                "actionCallback": actionMapper, 
-                "learnCallback": finishLearning,
-                "learnDivId": "learningShownHere",
-                "gestureDivId": "gestureShownHere",
-                "settings": {"ACTION_RATE": -1, "LEARNING_COUNT_DOWN": 10, "VIDEO_WIDTH": 500, "VIDEO_HEIGHT": 400, "GESTURE_WIDTH": 100, "GESTURE_HEIGHT": 80},
-            });
+        JSHG.init({
+            "actionCallback": actionMapper, 
+            "learnCallback": finishLearning,
+            "learnDivId": "learningShownHere",
+            "gestureDivId": "gestureShownHere",
+            "settings": {
+              "learningCountDown_": 10, 
+              "cameraWidth": 500, 
+              "cameraHeight": 400, 
+              "gestureDisplayWidth": 100, 
+              "gestureDisplayHeight": 80
+            },
         });
     </script> 
   </body>

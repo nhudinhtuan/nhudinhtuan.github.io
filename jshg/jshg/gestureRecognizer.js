@@ -1,30 +1,40 @@
+/*!
+ * Worker to track hand
+ * This uses computer vision functions provided by JSCV library to trach the hand.
+ * JSCV library is currently developing by Intel, HCM and NUS
+ *
+ * Copyright 2014
+ *
+ */
+
+/* ------- IMPORT JSCV LIBRARY ------- */
 importScripts("ParallelJS-CV.min.js");
 
-
-/* ------- CONSTANTS ------- */
-// request types
+/* ----------- CONSTANTS ---------- */
 INIT_REQUEST = "initRequest";
 LEARNING_REQUEST = "learningRequest";
 DETECT_REQUEST = "detectRequest";
-// for learning
 H_BOUND_LEARN = 15;
 S_BOUND_LEARN = 0.15;
 V_BOUND_LEARN = 0.15;
 
 /* ------- GLOBAL VARIABLES ------- */
-var learnedColors = [];
-var debugMode = false;
-var responseScale = [1, 1];
+var learningPoints_ = []
+var skinColorBounds_ = [];
+var responseScale_ = [1, 1];
+var responseThreshImage_ = false;
+var debugMode_ = false;
 
-function detect(frame) {
-    var response = {"handPos": [-1, -1], "nFingers": -1, "fingers": [], "threshImage": null, "debug": null};
-    if (frame == null || learnedColors.length == 0)
+/* -------- FUNCTIONS -------- */
+function trackHand(frame) {
+    var response = {"handPos": null, "fingers": null, "threshImage": null, "debugInfo": null};
+    if (!frame || skinColorBounds_.length == 0)
         return response;
 
     var medianWindow = 5;
     var jscvImage = new jscv.coredt.Image(frame.width, frame.height, jscv.uint8Clamped, frame.data.buffer);
     jscvImage.colorMode = jscv.COLOR_RGBA;
-    var thresholdedImage = jscv.imgproc.colorThreshold(jscvImage, learnedColors, jscv.COLOR_HSV);
+    var thresholdedImage = jscv.imgproc.colorThreshold(jscvImage, skinColorBounds_, jscv.COLOR_HSV);
     var blurImage = jscv.imgproc.boxBlur(thresholdedImage, medianWindow);
     var secondThreshImage = jscv.imgproc.threshold(blurImage, jscv.THRESH_BINARY, 50, 255);
     var contours = jscv.imgproc.findContours(secondThreshImage);
@@ -59,7 +69,6 @@ function detect(frame) {
     }
 
     var fingerDefects = [];
-
     //Find fingers
     for (var i = 0; i < defects.length; ++i) {
         var defect = defects[i];
@@ -73,7 +82,6 @@ function detect(frame) {
     }
 
     var hullLines = [];
-
     for(var i = 0; i < hull.length; ++i) {
         hullLines[i] = new jscv.coredt.Line(hull[i], hull[(i+1)%hull.length]);
     }
@@ -97,16 +105,15 @@ function detect(frame) {
     }
 
     response.handPos = [center.x, center.y];
-    response.nFingers = fingers.length;
     response.fingers = fingers;
 
+    if (responseThreshImage_) {
+        var responseThreshImage = jscv.imgproc.resizeMult(secondThreshImage, responseScale_[0], responseScale_[1]);
+        response.threshImage = responseThreshImage.data.data;
+    }
 
-    var responseThreshImage = jscv.imgproc.resizeMult(secondThreshImage, responseScale[0], responseScale[1]);
-    response.threshImage = responseThreshImage.data.data;
-
-    if (debugMode == true) {
+    if (debugMode_ == true) {
         response.debug = {"contour" : null, "hullLines": hullLines, "defectLines": defectLines}
-
         /*
         var maxContour = contours[maxIndex];
         // for current contour, convert as necessary to get a list of points
@@ -122,25 +129,25 @@ function detect(frame) {
     return response;
 }
 
-function learnFrame(learningPoints, frame) {
+function learnSkinColors(frame) {
     var hBound = H_BOUND_LEARN;
     var sBound = S_BOUND_LEARN;
     var vBound = V_BOUND_LEARN;
 
     var jscvImage = new jscv.coredt.Image(frame.width, frame.height, jscv.uint8Clamped, frame.data.buffer);
     var hsvImage = jscv.imgproc.convertColor(jscvImage, jscv.COLOR_HSV);
-    learnedColors = new Array(learningPoints.length);
+    skinColorBounds_ = new Array(learningPoints_.length);
 
-    var response = new Array(learningPoints.length);
-    for (var i = 0; i < learningPoints.length; ++i) {
-        var px = parseInt(learningPoints[i][0]);
-        var py = parseInt(learningPoints[i][1]);
+    var response = new Array(learningPoints_.length);
+    for (var i = 0; i < learningPoints_.length; ++i) {
+        var px = parseInt(learningPoints_[i][0]);
+        var py = parseInt(learningPoints_[i][1]);
 
         var h = hsvImage.data.get(py, px, 0);
         var s = hsvImage.data.get(py, px, 1);
         var v = hsvImage.data.get(py, px, 2);
         response[i] = [h, s, v];
-        learnedColors[i] = new jscv.imgproc.Bound(h-hBound, h+hBound, 
+        skinColorBounds_[i] = new jscv.imgproc.Bound(h-hBound, h+hBound, 
                                               s-sBound, s+sBound, 
                                               v-vBound, v+vBound);
     }
@@ -148,40 +155,42 @@ function learnFrame(learningPoints, frame) {
     return response;
 }
 
-function learnColor(hsvArr) {
+function createColorBounds(hsvColors) {
     var hBound = H_BOUND_LEARN;
     var sBound = S_BOUND_LEARN;
     var vBound = V_BOUND_LEARN;
 
-    learnedColors = new Array(hsvArr.length);
+    skinColorBounds_ = new Array(hsvColors.length);
     var h, s, v;
-    for (var i = 0; i < hsvArr.length; ++i) {
-        h = hsvArr[i][0];
-        s = hsvArr[i][1];
-        v = hsvArr[i][2]; 
-        learnedColors[i] = new jscv.imgproc.Bound(h-hBound, h+hBound, 
+    for (var i = 0; i < hsvColors.length; ++i) {
+        h = hsvColors[i][0];
+        s = hsvColors[i][1];
+        v = hsvColors[i][2]; 
+        skinColorBounds_[i] = new jscv.imgproc.Bound(h-hBound, h+hBound, 
                                               s-sBound, s+sBound, 
                                               v-vBound, v+vBound);        
     }
 }
 
 function init(data) {
-    debugMode = data.debugMode;
-    responseScale = data.responseScale;
-    learnColor(data.learnedHSV);
-
+    debugMode_ = data.debugMode;
+    responseScale_ = data.responseScale;
+    createColorBounds(data.skinColors);
+    learningPoints_ = data.learningPoints;
+    responseThreshImage_ = data.responseThreshImage;
     jscv.USE_JS_ARRAY_FLAG_ = true;
 }
 
+// Listen the data from the main thread
 self.addEventListener('message', function(e) {
     var receivedData = e.data;
     var response = null;
     if (receivedData.type == INIT_REQUEST) {
-        init(receivedData.config);
+        init(receivedData.data);
     } else if (receivedData.type == LEARNING_REQUEST) {
-        response = learnFrame(receivedData.learningPoints, receivedData.frame);
+        response = learnSkinColors(receivedData.data);
     } else {
-        response = detect(receivedData.frame);
+        response = trackHand(receivedData.data);
     }
-    self.postMessage({"type": receivedData.type, "response": response});
+    self.postMessage({"type": receivedData.type, "data": response});
 }, false);
