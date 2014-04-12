@@ -26,5 +26,11 @@ http://nhudinhtuan.github.io/jshg/slides/
 2. Google Earth
 http://nhudinhtuan.github.io/jshg/gge/
 
+FEEDBACK
+-------------
+JSHG is still under development, it is good if you could give us some feedbacks.
+https://www.surveymonkey.com/s/Z2PSTC2
+Thank you.
+
 -------------
 Last updated, 13th April 2014
