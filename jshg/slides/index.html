@@ -12,243 +12,262 @@
     <script src='./html5slides/slides.js'></script>
 
     <!-- Hand demo -->
-    <script type="text/javascript" src="../lib/jquery.js"></script>
+    <script type="text/javascript" src="../jshg/jquery.js"></script>
     <script type="text/javascript" src="../jshg/compatibility.js"></script>
     <script type="text/javascript" src="../jshg/jshg.js"></script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="../css/pure-min.css">
+    <style>
+      .button-jshg {
+        color: white;
+        border-radius: 4px;
+        text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+        text-decoration: none !important;
+        font-size: 12px;
+      }
+      .button-jshg:hover { 
+        color: white;
+      }
+      .button-start {
+        background: rgb(66, 184, 221);      
+      }
+      .button-start:hover {
+        background: rgb(223, 117, 20);
+      }
+      .button-stop {
+        background: rgb(223, 117, 20);  
+      }
+      .button-stop:hover {
+        background: rgb(66, 184, 221);    
+      }
+
+      .button-red {
+        color: white !important;
+        border-radius: 4px;
+        text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+        text-decoration: none !important;
+        font-size: 12px;
+        background: rgb(202, 60, 60);
+      }
+
+      .button-red:hover {
+        color: white;
+        background: rgb(180, 60, 60);
+      }      
+
+      .gesture-div {
+        margin-top: 13px; 
+        margin-left:74px; 
+        width:80px;
+        position: absolute;
+        z-index: 3000;
+      }
+      .learning-div {
+        padding-top: 25px;
+        width:500;
+        text-align: center;
+      }
+    </style>
   </head>
   
-  <style>
-.button, .button span {
-    display: inline-block;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
-    font-size: 12px;
-}
-.button {
-    white-space: nowrap;
-    line-height:1em;
-    position:relative;
-    outline: none;
-    overflow: visible; /* removes extra side padding in IE */
-    cursor: pointer;
-    border: 1px solid #999;/* IE */
-    border: rgba(0, 0, 0, .2) 1px solid;/* Saf4+, Chrome, FF3.6 */
-    border-bottom:rgba(0, 0, 0, .4) 1px solid;
-    -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.2);
-    -moz-box-shadow: 0 1px 2px rgba(0,0,0,.2);
-    box-shadow: 0 1px 2px rgba(0,0,0,.2);
-    background: -moz-linear-gradient(
-        center top,
-        rgba(255, 255, 255, .1) 0%,
-        rgba(0, 0, 0, .1) 100%
-    );/* FF3.6 */
-    background: -webkit-gradient(
-        linear,
-        center bottom,
-        center top,
-        from(rgba(0, 0, 0, .1)),
-        to(rgba(255, 255, 255, .1))
-    );/* Saf4+, Chrome */
-    filter:  progid:DXImageTransform.Microsoft.gradient(startColorStr='#19FFFFFF', EndColorStr='#19000000'); /* IE6,IE7 */
-    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#19FFFFFF', EndColorStr='#19000000')"; /* IE8 */
-    -moz-user-select: none;
-    -webkit-user-select:none;
-    -khtml-user-select: none;
-    user-select: none;
-    margin-bottom:10px;
-}
-.button.full, .button.full span {
-    display: block;
-}
-.button:hover, .button.hover {
-    background: -moz-linear-gradient(
-        center top,
-        rgba(255, 255, 255, .2) 0%,
-        rgba(255, 255, 255, .1) 100%
-    );/* FF3.6 */
-    background: -webkit-gradient(
-        linear,
-        center bottom,
-        center top,
-        from(rgba(255, 255, 255, .1)),
-        to(rgba(255, 255, 255, .2))
-    );/* Saf4+, Chrome */
-    filter:  progid:DXImageTransform.Microsoft.gradient(startColorStr='#33FFFFFF', EndColorStr='#19FFFFFF'); /* IE6,IE7 */
-    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#33FFFFFF', EndColorStr='#19FFFFFF')"; /* IE8 */
-}
-.button:active, .button.active {
-    top:1px;
-}
-.button span {
-    position: relative;
-    color:#fff;
-    text-shadow:0 1px 1px rgba(0, 0, 0, 0.25);
-    border-top: rgba(255, 255, 255, .2) 1px solid;
-    padding:0.6em 1.3em;
-    line-height:1em;
-    text-decoration:none;
-    text-align:center;
-    white-space: nowrap;
-}
-.button.small span {
-    font-size:12px;
-}
-.button.medium span {
-    font-size:14px;
-}
-.button.large span {
-    font-size:18px;
-}
-.button.black {
-    background-color: #333333;
-}
-.button.gray {
-    background-color: #666666;
-}
-.button.white {
-    background-color: #FFFFFF;
-}
-.button.white span{
-    color: #666666;
-}
-.button.red {
-    background-color: #e62727;
-}
-.button.orange {
-    background-color: #ff5c00;
-}
-.button.magenta {
-    background-color: #A9014B;
-}
-.button.yellow {
-    background-color: #ffb515;
-}
-.button.blue {
-    background-color: #00ADEE;
-}
-.button.pink {
-    background-color: #e22092;
-}
-.button.green {
-    background-color: #91bd09;
-}
-.button.rosy {
-    background-color: #F16C7C;
-}
-.button.brown {
-    background-color: #804000;
-}
-.button.purple {
-    background-color: #800080;
-}
-.button.cyan {
-    background-color: #46C7C7;
-}
-.button.gold {
-    background-color: #D4A017;
-}
-  </style>
-
-  <body style='display: none'>
-    <div style="padding-left:74px; padding-top:10px; width:80px; z-index:2000">
-      <div id="gestureShown">
-      </div>
-      <p align="center" style="margin-top:0px; margin-left:12px"><a href="javascript:JSHGToggle()" class="button small blue"><span>START</span></a></p>
+  <body style="display:none">
+    <div class='gesture-div'>
+      <div id="gestureShownHere"></div>
+      <p align="center" style="margin-top:0px;">
+        <a class="button-jshg button-start pure-button" onClick="JSHGToggle($(this))" target="new">START JSHG</a>
+      </p>
     </div>
     <section class='slides layout-regular template-default'>
-
       <!-- Your slides (<article>s) go here. Delete or comment out the
            slides below. -->
       <article>
-        <h1>
-          JSHG - Presentation Demo
-        </h1>
-        <p>
-          Javascript Hand Gesture Plugin
-          <br>
-          April, 2014
-        </p>
+        <center>
+          <img src="hand.jpg"/><br/><br/>
+          <h3 align="center">JAVASCRIPT HAND GESTURE PLUGIN DEMO</h3>
+          <p>April - 2014</p>
+        </center>
       </article>
       
-      <article>
+      <article class='smaller'>
         <h3>
-          Introduction
+          CLICK "START JSHG" BUTTON TO CONTROL SLIDES WITH YOUR HAND!
         </h3>
-        <p>
-          JSHG (Javascript Hand Gesture) is a plugin for integrating hand gesture recognition into your websites or browser-based applications.
-        </p>
-        <p>
-          It is fast, flexible and easy to use.
-        </p>
-        <p>
-          This presentation shows you how to use it in your own apps.
-        </p>
+        <div id="learningShownHere" class="learning-div"></div>
+        <div id="startInstruction">
+          <ul>
+            <li>JSHG is learning your skin color for the first time.</li>
+            <li>After learning, the hand gesture images are shown on the left corner.<br><br>
+              <center><img src="handgestureimage.jpg" width="200px"/><br>
+                <i>the red dot is the position of hand, yellow dots are fingers.</i>
+              </center>
+            </li>
+            <li>Move hand (the red dot) to the left to move the slide backward.</li>
+            <li>Move hand (the red dot) to the righ to move the slide forward.</li>
+          </ul>
+        </div>
       </article>
 
       <article>
         <h3>
-          Why not try it right now !
+          IS IT COOL?
         </h3>
         <p align="center">
-          <a href="javascript:JSHG.start();">START USING GESTURES</a>
-        </p>
-        <p>
-          <div id="webcamShown" style="width:500" align="center"></div>
+          <img src='handcolor.jpg'><br>
+          How can we do that?
         </p>
       </article>
 
       <article class='smaller'>
         <h3>
-          HOW TO USE
+          WE USE JAVASCRIPT HAND GESTURE PLUGIN (JSHG)
         </h3>
-        <p>
-          STEP 1: Download and unzip the latest version of JSHG.
-        </p>
-        <p>
-          STEP 2: Look inside the js folder to find
-        </p>
+        <ul>
+          <li>It allows you to integrate the hand gesture recognition with your website.</li>
+          <li>It is easy to use and easy to install.</li>
+          <li>No background in computer vision is required.</li>
+          <li>It provides a basic set of hand gestures and more are coming soon.</li>
+          <li>It is fast and stable by employing multi-threading models (HTML5 web worker feature).</li>
+        </ul>
       </article>
       
       <article>
         <h3>
-          Testing 1
+          HOW TO USE JSHG
         </h3>
+        <p>Download and unzip the latest version of JSHG and just follow three main steps</p>
+        <p align="center">
+          <a class="button-jshg button-red pure-button" href="" target="new">GET THE ZIP FILE</a>
+          <a class="button-jshg button-red pure-button" href="" target="new">DOWNLOAD FROM GITHUB</a>          
+        </p>
+        <ul>
+          <li>Step 1 : Load JSHG files</li>
+          <li>Step 2 : Config JSHG</li>
+          <li>Step 3 : Turn it on</li>
+        <ul>
       </article>
 
       <article>
         <h3>
-          Testing 2
+          STEP 1 - LOAD JSHG FILES
         </h3>
+        <section>
+        <pre>
+/*          
+ Look inside the jshg folder to find jquery.js, compatibility.js, jshg.js and load all of them in the following order
+*/
+&lt;script src=&quot;jshg/jquery.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;jshg/compatibility.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;jshg/jshg.js&quot;&gt;&lt;/script&gt;
+</pre>
+        </section>        
       </article>
 
       <article>
         <h3>
-          Testing 3
+          STEP 2 - CONFIG JSHG
         </h3>
+        <section>
+        <pre>
+&lt;script type='text/javascript'&gt;
+  // Define a function to map the gesture 
+  // returning from JSHG with your actions
+  var actionMapper = function(gesture) {
+    if (gesture.isLeft) 
+        console.log("Hey, your hand is on the left side");
+    ...
+  }
+  // Config JSHG
+  JSHG.config({
+    "actionCallback": actionMapper
+  });
+&lt;/script&gt;</pre>
+        </section>
+      </article>
+
+      <article>
+       <h3>
+          STEP 3 - TURN IT ON
+        </h3>
+        <p>At this time, JSHG is ready to use</p>
+        <section>
+        <pre>
+&lt;script type='text/javascript'&gt;
+JSHG.start();
+&lt;/script&gt;</pre>
+        </section>
+        <p>You may want to let it learn the skin color before staring. To do that, use the following function instead of start()</p>
+        <section>
+        <pre>
+&lt;script type='text/javascript'&gt;
+JSHG.learn();
+&lt;/script&gt;</pre>
+        </section>        
       </article>
 
       <article>
         <h3>
-          Testing 4
+          THAT'S - YOU GET JSHG IN YOUR WEB APPLICATION
         </h3>
+        <p align="center">
+          <img src='be_happy.jpg'><br>
+          How can we do that?
+        </p>
+      </article>
+      
+      <article class='nobackground'>
+        <h3>
+          More information is available on our website.
+        </h3>
+        <iframe src='http://localhost/jshg/'></iframe>
       </article>
 
-
       <article>
+        <q>
+          The best way to predict the future is to invent it.
+        </q>
+        <div class='author'>
+          Alan Kay
+        </div>
+      </article>
+
+     <article>
         <h3>
-          Testing 5
+          Thank You !
         </h3>
+        <p>Hope you enjoy it and predict your own future.</p>
       </article>
 
     </section>
      <script type="text/javascript">
         var currentGesture = null;
-
-        function JSHGToggle() {
-            if (JSHG.isRunning) JSHG.stop();
-            JSHG.start();
+        var firstTime = true;
+        function JSHGToggle(toggleBut) {
+            toggleBut.removeClass("button-stop");
+            toggleBut.removeClass("button-start");
+            if (JSHG.isRunning) {
+              JSHG.stop();
+              toggleBut.addClass("button-start");
+              toggleBut.html("START JSHG");
+            } else {
+              if (firstTime) {
+                curSlide = 1;
+                updateSlides();
+                JSHG.learn();
+                $("#startInstruction").hide();
+              } else {
+                JSHG.start();
+              }
+              toggleBut.addClass("button-stop");
+              toggleBut.html("STOP JSHG");
+            }
+            firstTime = false;
         }
+
+        var finishLearning = function() {
+          $("#startInstruction").show();
+        }
+
         var actionMapper = function(gesture) {
             if (currentGesture != null && currentGesture.isSamePos(gesture)) return;
             if (gesture.isLeft) {
@@ -256,16 +275,16 @@
             } else if (gesture.isRight) {
                 prevSlide();
             };
-            if (currentGesture != null && currentGesture.nFingers > 3 && gesture.nFingers < 3) {
-                JSHG.stop();
-            }
             currentGesture = gesture;
         }
-        JSHG.config({
-            "callback": actionMapper, 
-            "learnDivId": "webcamShown",
-            "gestureDivId": "gestureShown",
-            "settings": {"ACTION_RATE": -1, "LEARNING_COUNT_DOWN": 5, "VIDEO_WIDTH": 500, "VIDEO_HEIGHT": 400, "GESTURE_WIDTH": 100, "GESTURE_HEIGHT": 80},
+        $(window).load(function() {
+            JSHG.config({
+                "actionCallback": actionMapper, 
+                "learnCallback": finishLearning,
+                "learnDivId": "learningShownHere",
+                "gestureDivId": "gestureShownHere",
+                "settings": {"ACTION_RATE": -1, "LEARNING_COUNT_DOWN": 10, "VIDEO_WIDTH": 500, "VIDEO_HEIGHT": 400, "GESTURE_WIDTH": 100, "GESTURE_HEIGHT": 80},
+            });
         });
     </script> 
   </body>

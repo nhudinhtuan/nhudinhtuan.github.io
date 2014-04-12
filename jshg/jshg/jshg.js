@@ -12,15 +12,15 @@ JSHG.SETTINGS["VIDEO_HEIGHT"] = 400;
 JSHG.SETTINGS["GESTURE_WIDTH"] = 125;
 JSHG.SETTINGS["GESTURE_HEIGHT"] = 100;
 JSHG.SETTINGS["ACTION_RATE"] = 10; // per second, -1 means calling when the frame is process
-JSHG.SETTINGS["LEARNING_COUNT_DOWN"] = 5; // seconds
+JSHG.SETTINGS["LEARNING_COUNT_DOWN"] = 8; // seconds
 JSHG.SETTINGS["CENTRAL_AREA_RATIO"] = 1/3;
 JSHG.SETTINGS["LEARNING_POINTS"] = null;
 JSHG.SETTINGS["LEARNING_COLOR_HSV"] = [[340, 0.07,0.45]];
 
 JSHG.SETTINGS["COLOR_LEARNING_POINTS"] = "yellow";
-JSHG.SETTINGS["COLOR_BOUNDING_LINES"] = "red";
+JSHG.SETTINGS["COLOR_BOUNDING_LINES"] = "white";
 JSHG.SETTINGS["COLOR_HAND_POS"] = "red";
-JSHG.SETTINGS["COLOR_FINGRE_POS"] = "red";
+JSHG.SETTINGS["COLOR_FINGRE_POS"] = "yellow";
 
 /* ------- CONSTANTS ------- */
 JSHG.WORKER_INIT_REQUEST = "initRequest";
@@ -28,6 +28,7 @@ JSHG.WORKER_LEARN_REQUEST = "learningRequest";
 JSHG.WORKER_DETECT_REQUEST = "detectRequest";
 JSHG.FRAME_BUFFER_SIZE = 1;
 JSHG.ACTIONS_BUFFER_SIZE = 3;
+JSHG.LEARNING_MESSAGE = "The learning process is running. Please place your hand over the dots. Time left: ";
 
 /* ------- GLOBAL VARIABLES ------- */
 // dom comp
@@ -45,7 +46,10 @@ JSHG.grWorker = new Worker('../jshg/gestureRecognizer.js');
 // config
 JSHG.learningArea = null;
 JSHG.gestureArea = null;
-JSHG.actionCallBack = null;
+
+// callback
+JSHG.actionCallback = null;
+JSHG.learnCallback = null
 
 // ids
 JSHG.reqFrameReaderId = 0;
@@ -73,6 +77,7 @@ JSHG.HandGesture = function() {
         this.isUp = false;
         this.isDown = false;
         this.nFingers = 0;
+        this.handPos = [-1, -1]; // relative to the GESTURE_WIDTH & GESTURE_HEIGHT
     }
 
     HandGesture.prototype = {
@@ -146,7 +151,9 @@ JSHG.init_ = function() {
                     JSHG.actionIntervalId = setInterval(JSHG.actionScheduler_, 1000/JSHG.SETTINGS["ACTION_RATE"]);
                 }
 
-                JSHG.showGestureCanvas_ ();
+                if (!JSHG.isLearning) {
+                    JSHG.showGestureCanvas_ ();
+                }
                 JSHG.postWorkerDetect_(null);
             }, 500);
         }, function (error) {
@@ -158,15 +165,14 @@ JSHG.init_ = function() {
 }
 
 JSHG.showLearningCanvas_ = function() {
-    // hide gesture
+    if (JSHG.learningArea == null) return;
     JSHG.hideGestureCanvas_();
-
     JSHG.learningArea.append(JSHG.videoCanvas);
     JSHG.learningArea.append(JSHG.learningMessage);
 }
 JSHG.hideLearningCanvas_ = function() {
+    if (JSHG.learningArea == null) return;
     JSHG.showGestureCanvas_();
-
     JSHG.videoCanvas.remove();
     JSHG.learningMessage.remove();
 }
@@ -180,7 +186,7 @@ JSHG.hideGestureCanvas_ = function() {
 }
 
 
-JSHG.learning_ = function() {
+JSHG.learn_ = function() {
     JSHG.isLearning = true;
     JSHG.learningCountDown = JSHG.SETTINGS["LEARNING_COUNT_DOWN"];
     clearTimeout(JSHG.countDownId);
@@ -190,7 +196,7 @@ JSHG.learning_ = function() {
     function countDown() {
         JSHG.learningCountDown -= 1;
         if (JSHG.learningCountDown > 0) {
-            JSHG.learningMessage.html("Learning Process is running. Please place your palm over the red area. Time left: " + JSHG.learningCountDown);
+            JSHG.learningMessage.html(JSHG.LEARNING_MESSAGE + JSHG.learningCountDown);
             JSHG.countDownId = setTimeout(countDown, 1000);
         } else {
             JSHG.countDownId = 0;
@@ -338,7 +344,8 @@ JSHG.grWorker.addEventListener('message', function(e) {
         JSHG.isLearning = false;
         JSHG.learningMessage.html("");
         JSHG.hideLearningCanvas_();
-        JSHG.showGestureCanvas_ ();
+        if (JSHG.learnCallback != null)
+            JSHG.learnCallback();
     } else if (receivedData.type == JSHG.WORKER_DETECT_REQUEST) {
         // save state
         JSHG.handInfo = receivedData.response;
@@ -361,21 +368,25 @@ JSHG.generateGesture_ = function() {
     var centralAreaWidth = JSHG.SETTINGS["VIDEO_WIDTH"] * JSHG.SETTINGS["CENTRAL_AREA_RATIO"];
     var centralAreaHeight = JSHG.SETTINGS["VIDEO_HEIGHT"] * JSHG.SETTINGS["CENTRAL_AREA_RATIO"];
 
-    // LEFT - RIGHT
-    if (handInfo.handPos[0] < (w - centralAreaWidth)/2) {
-        gesture.isLeft =  true;
-    } else if (handInfo.handPos[0] > (w + centralAreaWidth)/2) {
-        gesture.isRight =  true;
-    }
 
-    // TOP - DOWN
-    if (handInfo.handPos[1] < (h - centralAreaHeight)/2) {
-        gesture.isUp =  true;
-    } else if (handInfo.handPos[1] > (h + centralAreaHeight)/2) {
-        gesture.isDown =  true;        
-    }
+    if (handInfo.handPos[0] > - 1) {
+        gesture.handPos = [handInfo.handPos[0] * JSHG.SETTINGS["GESTURE_WIDTH"]/w, handInfo.handPos[1] * JSHG.SETTINGS["GESTURE_HEIGHT"]/h];
+        // LEFT - RIGHT
+        if (handInfo.handPos[0] < (w - centralAreaWidth)/2) {
+            gesture.isLeft =  true;
+        } else if (handInfo.handPos[0] > (w + centralAreaWidth)/2) {
+            gesture.isRight =  true;
+        }
 
-    gesture.nFingers = handInfo.nFingers;       
+        // TOP - DOWN
+        if (handInfo.handPos[1] < (h - centralAreaHeight)/2) {
+            gesture.isUp =  true;
+        } else if (handInfo.handPos[1] > (h + centralAreaHeight)/2) {
+            gesture.isDown =  true;        
+        }
+
+        gesture.nFingers = handInfo.nFingers; 
+    }      
 
     JSHG.gestures.push(gesture);
     if (JSHG.gestures.length > JSHG.ACTIONS_BUFFER_SIZE)
@@ -388,21 +399,24 @@ JSHG.actionScheduler_ = function() {
     }
 
     if (JSHG.lastGesture != null) {
-        JSHG.actionCallBack(JSHG.lastGesture);
+        JSHG.actionCallback(JSHG.lastGesture);
     }
 }
 
 
 /* ------- PUBLIC API ------- */
 JSHG.config = function(data) {
-    // callback, learnDivId, gestureDivId, debugDivId, settings, workerConfig
-    if (!("callback" in data) || !("learnDivId" in data))
-        throw "callback && learnDivId is required!";
+    // actionCallback, learnCallback, learnDivId, gestureDivId, debugDivId, settings, workerConfig
+    if (!("actionCallback" in data))
+        throw "actionCallback is required!";
 
     var workerInit = {"debugMode": false, "responseScale": [1, 1], "learnedHSV": null, "configs": null};
 
-    JSHG.actionCallBack = data["callback"];
-    JSHG.learningArea = $("#" + data["learnDivId"]);
+    JSHG.actionCallback = data["actionCallback"];
+    if ("learnCallback" in data)
+        JSHG.learnCallback = data["learnCallback"];
+    if ("learnDivId" in data)
+        JSHG.learningArea = $("#" + data["learnDivId"]);
     if ("settings" in data) {
         for (var prop in data["settings"]) {
             if (prop in JSHG.SETTINGS) {
@@ -428,8 +442,10 @@ JSHG.config = function(data) {
 };
 
 JSHG.start = function() {
-    if (JSHG.actionCallBack == null)
+    if (JSHG.actionCallback == null)
         throw "JSHG must be configured first!";
+    if (JSHG.isLearning)
+        return;
 
     if (JSHG.video == null) {
         JSHG.init_();
@@ -462,14 +478,14 @@ JSHG.stop = function() {
     JSHG.lastGesture = null;
     JSHG.handInfo = null;
     JSHG.isRunning = false;
+
+    if (JSHG.isLearning == true && JSHG.learnCallback !=null)
+        JSHG.learnCallback();
+    JSHG.isLearning = false;
 }
 
-JSHG.learning = function() {
+JSHG.learn = function() {
     JSHG.stop();
     JSHG.start();
-    JSHG.learning_();
-}
-
-JSHG.isRunning = function() {
-    return JSHG.isRunning;
+    JSHG.learn_();
 }

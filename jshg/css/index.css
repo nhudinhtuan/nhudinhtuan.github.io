@@ -1,0 +1,42 @@
+.button-secondary {
+    color: white;
+    border-radius: 4px;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+    text-decoration: none !important;
+}
+.button-secondary {
+    background: rgb(66, 184, 221); /* this is a light blue */
+}
+code {
+    color: #777;
+    background-color: #f2f2f2;
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    -ms-border-radius: 6px;
+    -o-border-radius: 6px;
+    border-radius: 6px;
+    font-family: Consolas, Courier, monospace;
+    font-size: 0.9rem;
+    padding: 0.1rem 0.3rem;
+    position: relative;
+    top: -1px;
+}
+pre {
+    background-color: #f2f2f2;
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    -ms-border-radius: 6px;
+    -o-border-radius: 6px;
+    border-radius: 6px;
+    padding: 0 0.5rem 0.1rem 0.5rem;
+}
+pre code {
+    padding: 0;
+    font-size: 0.8rem;
+    border: none;
+}
+ol {
+    list-style-type: decimal;
+    margin: 0 0 1.25em 0;
+    padding: 0 0 0 20px;
+}

@@ -1,0 +1,39 @@
+<html>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <head>
+    <title>JSHG Testing</title>
+    <script type="text/javascript" src="../jshg/jquery.js"></script>
+    <script type="text/javascript" src="../jshg/compatibility.js"></script>
+    <script type="text/javascript" src="../jshg/jshg.js"></script>
+  </head>
+  <body>
+    <div style="margin: auto 0">
+        <p>
+            <button onClick="JSHG.start()">START HAND GESTURE</button>
+            <button onClick="JSHG.stop()">PAUSE HAND GESTURE</button>
+            <button onClick="JSHG.learn()">LEARN</button>
+        </p>
+    </div>
+    <div id="mainArea"></div>
+    <script>
+      $(window).load(function() {
+        var actionMapper = function(gesture) {
+            console.log(gesture);
+            /*
+            if (gesture == "G_HANDLEFT" && currentGesture != gesture) {
+                nextSlide();
+            } else if (gesture == "G_HANDRIGHT" && currentGesture != gesture) {
+                prevSlide();
+            };
+            currentGesture = gesture;*/
+        }
+        JSHG.config({
+            "actionCallback": actionMapper, 
+            "learnDivId": "mainArea",
+            "gestureDivId": "mainArea",
+            "settings": {"ACTION_RATE": -1, "LEARNING_COUNT_DOWN": 5, "GESTURE_WIDTH": 350, "GESTURE_HEIGHT": 300},
+        });
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<!--
+  NUS & HCM - ParallelJS-CV
+-->
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="JSHG is a script used to integrate the hand gesture recognition on your web application. It's a snap to setup and works on most of modern browsers.">
+    <title>Javascript Hand Gesture Plugin</title>
+    <link rel="stylesheet" href="css/pure-min.css">
+    <!--[if lte IE 8]>
+        <link rel="stylesheet" href="css/main-grid-old-ie.css">
+        <link rel="stylesheet" href="css/blog-old-ie.css">
+    <![endif]-->
+    <!--[if gt IE 8]><!-->
+        <link rel="stylesheet" href="css/main-grid.css">
+        <link rel="stylesheet" href="css/blog.css">
+    <!--<![endif]-->
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+
+<div id="layout" class="pure-g">
+    <div class="sidebar pure-u-1 pure-u-med-1-4">
+        <div class="header">
+            <hgroup>
+                <h1 class="brand-title">JSHG</h1>
+                <h2 class="brand-tagline">Control your web applications with hand gestures via webcam.</h2>
+            </hgroup>
+
+            <nav class="nav">
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a class="pure-button" href="#">Download</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="pure-button" href="#">Github</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="pure-button" href="./reference.html">Reference</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <div class="content pure-u-1 pure-u-med-3-4">
+        <div>
+            <!-- A wrapper for all the blog posts -->
+            <div class="posts">
+                <h1 class="content-subhead">Introduction</h1>
+
+                <!-- A single blog post -->
+                <section class="post">
+                    <header class="post-header">
+                        <h2 class="post-title">Introducing JSHG</h2>
+                    </header>
+
+                    <div class="post-description">
+                        <p>
+                            Javascript Hand Gesture Plugin (JSHG) is a wonderful plugin that allows you to support the hand gesture recognition of users through web camera in your existing websites or web applications. You do not need to have any background in computer vision to use this plugin. It currently offers the basic set of hand gestures which include the position of hand (left, right, up, down) and counts the number of fingers. We provides a well-designed API for you to integrate JSHG to your application easily. If you have strong background in computer vision, it is very simple for you to customize JSHG according to your preference.
+                        </p>
+                    </div>
+                </section>
+            </div>
+
+
+           <div class="posts">
+                <h1 class="content-subhead">How To Use</h1>
+
+                <!-- A single blog post -->
+                <section class="post">
+                    <header class="post-header">
+                        <h2 class="post-title">How To Use</h2>
+                    </header>
+
+                    <div class="post-description">
+                        <h3>Step 1 - Load JSHG files.</h3>
+                        <ol>
+                            <li>Download and unzip the latest version of JSHG.</li>
+                            <li>Look inside the <code>jshg</code> folder to find <code>jquery.js</code>, <code>compatibility.js</code>, <code>jshg.js</code> and load all of them. You can replace <code>jquery.js</code> by your own jQuery library. All the files must be loaded in the following order:
+<pre><code>&lt;script src=&quot;jshg/jquery.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;jshg/compatibility.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;jshg/jshg.js&quot;&gt;&lt;/script&gt;</code></pre>
+                            </li>
+                        </ol>
+                        <h3>Step 2 - Config JSHG</h3>
+                        <ol>
+                            <li>Define a function to map the gesture returning from JSHG with your expected actions</li>
+<pre><code>var actionMapper = function(gesture) {
+    if (gesture.isLeft) 
+        console.log("Hey, your hand is on the left side");
+    ...
+}</code></pre>
+More details about the <code>gesture</code> object can be found at the <a href="./reference.html#gesture">reference</a> page.                        
+                            <li>Optional: add a <code>div</code> to display the gesture images.</li>
+<pre><code>&lt;div id=&quot;gestureShownHere&quot;&gt;&lt;/div&gt;</code></pre>
+                            <li>Config JSHG</li>                           
+<pre><code>JSHG.config({
+    "actionCallback": actionMapper, 
+    "learnDivId": "gestureShownHere",
+    "gestureDivId": "gestureShownHere",
+    "settings": {"VIDEO_WIDTH": 500, "VIDEO_HEIGHT": 400, "GESTURE_WIDTH": 100, "GESTURE_HEIGHT": 80},
+});</code></pre>
+More details about the <code>settings</code> options can be found at the <a href="./reference.html#settings">reference</a> page.                      
+                        </ol>
+                        <h3>Step 3 - Turn it on</h3>
+                        At this time, JSHG is ready to use.
+<pre><code>JSHG.start()</code></pre>
+                        To improve the accuracy of hand gesture recognition, you may want JSHG to learn the skin color before running. You can easily do that by using the following function instead of <code>JSHG.start()</code>
+<pre><code>JSHG.learn()</code></pre>                        
+                    </div>
+                </section>
+            </div>
+
+            <div class="posts">
+                <h1 class="content-subhead">Examples</h1>
+
+                <section class="post">
+                    <header class="post-header">
+                        <h2 class="post-title">Example 1 - HTML5Slides</h2>
+
+                        <p class="post-meta">
+                            <a class="button-secondary pure-button" href="./slides" target="jshgslides">Try now</a>
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        <p>
+                            In this example, we integrate JSHG with <a href="https://code.google.com/p/html5slides/">Google HTML5 slide template</a>. This allows you to create a wonderful presentation by controlling the slides by your hand gestures via webcam.<br>
+                            Two basic gestures are used: moving hand to the right moves the slide forward and moving hand to the left moves it backward.
+                        </p>
+                    </div>
+                </section>
+
+                <section class="post">
+                    <header class="post-header">
+                        <h2 class="post-title">Example 2 - Google Earth</h2>
+
+                        <p class="post-meta">
+                            <a class="button-secondary pure-button" href="./gge" target="jshggge">Try now</a>
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        <div class="post-images pure-g">
+                            <center><img alt="Google Earth" class="pure-img-responsive" src="images/gge.png"></center>
+                        </div>
+                        <p>
+                            Google Earth lets you fly anywhere on Earth and it is more interesting if you can fly by your hand. 
+                            We integrate JSHG with Google Earth API, so you can do that. Try it now and enjoy your journey :)
+                        </p>
+                    </div>
+                </section>
+            </div>
+
+
+            <div class="footer">
+                <div class="pure-menu pure-menu-horizontal pure-menu-open">
+                    <a>Created by NUS & HCM, 2014</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
