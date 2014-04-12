@@ -25,3 +25,6 @@ http://nhudinhtuan.github.io/jshg/slides/
 
 2. Google Earth
 http://nhudinhtuan.github.io/jshg/gge/
+
+-------------
+Last updated, 13th April 2014
