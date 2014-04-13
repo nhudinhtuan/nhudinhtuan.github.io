@@ -25,7 +25,7 @@ JSHG.WORKER_INIT_REQUEST = "initRequest";
 JSHG.WORKER_LEARN_REQUEST = "learningRequest";
 JSHG.WORKER_DETECT_REQUEST = "detectRequest";
 JSHG.ACTIONS_BUFFER_SIZE = 3;
-JSHG.LEARNING_MESSAGE = "The learning process is running. Please place your hand over the dots. Time left: ";
+JSHG.LEARNING_MESSAGE = "Please place your hand over the dots. The learning process is running in ";
 JSHG.EPSILON = 0.0001;
 
 /* ------- DATA STRUCTURE ------ */
