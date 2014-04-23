@@ -27,6 +27,8 @@ var debugMode_ = false;
 
 /* -------- FUNCTIONS -------- */
 function trackHand(frame) {
+    //var startTime = new Date().getTime();
+
     var response = {"handPos": null, "fingers": null, "threshImage": null, "debugInfo": null};
     if (!frame || skinColorBounds_.length == 0)
         return response;
@@ -37,7 +39,7 @@ function trackHand(frame) {
     var thresholdedImage = jscv.imgproc.colorThreshold(jscvImage, skinColorBounds_, jscv.COLOR_HSV);
     var blurImage = jscv.imgproc.boxBlur(thresholdedImage, medianWindow);
     var secondThreshImage = jscv.imgproc.threshold(blurImage, jscv.THRESH_BINARY, 50, 255);
-    var contours = jscv.imgproc.findContours(secondThreshImage);
+    var contours = jscv.cv.findContours(secondThreshImage);
     var maxDefects = null, maxHull, maxArea, maxIndex;
     maxArea = 0;
     maxIndex = 0;
@@ -113,19 +115,27 @@ function trackHand(frame) {
     }
 
     if (debugMode_ == true) {
-        response.debug = {"contour" : null, "hullLines": hullLines, "defectLines": defectLines}
+        response.debugInfo = {"contour" : contours[maxIndex], "hullLines": hullLines, "defectLines": defectLines}
         /*
-        var maxContour = contours[maxIndex];
-        // for current contour, convert as necessary to get a list of points
-        if (maxContour.approxMethod == jscv.CHAIN_APPROX_SIMPLE) {
-            response.debug.contour = maxContour.seqData;
-        } else {
-            var simpleContour = jscv.imgproc.convertContourApprox(maxContour, jscv.CHAIN_APPROX_SIMPLE);
-            response.debug.contour = maxContour.seqData;
-        }*/
-        // defec
+        if (contours.length > 0) {
+            var maxContour = contours[maxIndex].contour;
+            var seqData;
+            // for current contour, convert as necessary to get a list of points
+            if (maxContour.approxMethod == jscv.CHAIN_APPROX_SIMPLE) {
+                seqData = maxContour.seqData;
+            } else {
+                var simpleContour = jscv.imgproc.convertContourApprox(maxContour, jscv.CHAIN_APPROX_SIMPLE);
+                seqData = maxContour.seqData;
+            }
+            response.debug.contour = new Array(seqData.length);
+            for (var i = 0; i < seqData.length; i++)
+                response.debug.contour[i] = [seqData[i].x, seqData[i].y];
+            console.log(response.debug.contour);
+        }
+        */
     }
 
+    //console.log(new Date().getTime() - startTime);
     return response;
 }
 

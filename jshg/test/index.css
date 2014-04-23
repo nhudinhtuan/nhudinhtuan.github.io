@@ -1,0 +1,151 @@
+/* --------------------------
+ * Element Styles
+ * --------------------------
+*/
+
+body {
+    min-width: 320px;
+    color: #777;
+    line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: bold;
+    color: rgb(75, 75, 75);
+}
+h3 {
+    font-size: 1.25em;
+}
+h4 {
+    font-size: 1.125em;
+}
+
+a {
+    color: #3b8bba; /* block-background-text-normal */
+    text-decoration: none;
+}
+
+a:visited {
+    color: #265778; /* block-normal-text-normal */
+}
+
+dt {
+    font-weight: bold;
+}
+dd {
+    margin: 0 0 10px 0;
+}
+
+aside {
+    background: #1f8dd6; /* same color as selected state on site menu */
+    padding: 0.3em 1em;
+    border-radius: 3px;
+    color: #fff;
+}
+aside a, aside a:visited {
+    color: rgb(169, 226, 255);
+}
+
+
+
+/* --------------------------
+ * Header Module Styles
+ * --------------------------
+*/
+.header {
+     font-family: "omnes-pro", sans-serif;
+     max-width: 850px;
+     margin: 0 auto;
+     padding: 1em;
+     text-align: center;
+     border-bottom: 1px solid #eee;
+     background: #fff;
+ }
+.header h1 {
+    font-size: 300%;
+    font-weight: 100;
+    margin: 0;
+}
+ .header h2 {
+    font-size: 125%;
+    font-weight: 100;
+    line-height: 1.5;
+    margin: 0;
+    color: #666;
+}
+
+.content {
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1em;
+    padding-right: 1em;
+    max-width: 850px;
+}
+
+.content .content-subhead {
+    margin: 2em 0 1em 0;
+    font-weight: 300;
+    color: #888;
+    position: relative;
+}
+
+.content .content-spaced {
+    line-height: 1.8;
+}
+
+.content .content-quote {
+    font-family: "Georgia", serif;
+    color: #666;
+    font-style: italic;
+    line-height: 1.8;
+    border-left: 5px solid #ddd;
+    padding-left: 1.5em;
+}
+
+.content p {
+    font-size: 1.125em;
+}
+
+.mannualTestArea {
+    min-height: 310px;
+}
+
+.mannualTestArea p {
+    font-size: 12px;
+}
+
+.reportArea {
+    padding-top: 20px;
+}
+.reportArea code {
+    font-size: 14px;   
+}
+
+/* --------------------------
+ * Buttons
+ * --------------------------
+*/
+
+.button-jshg {
+	color: white;
+	border-radius: 4px;
+	text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+	text-decoration: none !important;
+	font-size: 12px;
+	margin-bottom: 3px;
+}
+.button-jshg:hover { 
+	color: white;
+}
+.button-start {
+	background: rgb(66, 184, 221);      
+}
+.button-start:hover {
+	background: rgb(223, 117, 20);
+}
+.button-stop {
+	background: rgb(223, 117, 20);  
+}
+.button-stop:hover {
+	background: rgb(66, 184, 221);    
+}

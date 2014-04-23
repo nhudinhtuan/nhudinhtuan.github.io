@@ -31,12 +31,21 @@ JSHG.EPSILON = 0.0001;
 /* ------- DATA STRUCTURE ------ */
 JSHG.HandGesture = function() {
     function HandGesture() {
-        this.isLeft = false;
-        this.isRight = false;
-        this.isUp = false;
-        this.isDown = false;
-        this.nFingers = 0;
-        this.handPos = [-1, -1]; // relative to the gestureDisplayWidth & gestureDisplayHeight
+        if (arguments.length == 6) {
+            this.isLeft = arguments[0];
+            this.isRight = arguments[1];
+            this.isUp = arguments[2];
+            this.isDown = arguments[3];
+            this.nFingers = arguments[4];
+            this.handPos = arguments[5];
+        } else {
+            this.isLeft = false;
+            this.isRight = false;
+            this.isUp = false;
+            this.isDown = false;
+            this.nFingers = 0;
+            this.handPos = [-1, -1]; // relative to the gestureDisplayWidth & gestureDisplayHeight
+        }
     }
     HandGesture.prototype = {
         "isSameRelativePos" : function(obj) {
@@ -109,10 +118,19 @@ JSHG.resetVariables_ = function() {
     JSHG.settings_["debugMode"] = false;
     // dom comp
     JSHG.video_ = null;
+    if (JSHG.videoCanvas_) {
+        JSHG.videoCanvas_.remove();
+    }
     JSHG.videoCanvas_ = null;
     JSHG.videoCanvasctx_ = null;
+    if (JSHG.gestureCanvas_) {
+        JSHG.gestureCanvas_.remove();
+    }
     JSHG.gestureCanvas_ = null;
     JSHG.gestureCanvasctx_ = null;
+    if (JSHG.learningMessage_) {
+        JSHG.learningMessage_.remove();
+    }
     JSHG.learningMessage_ = null;
     // worker
     JSHG.grWorker_ = null;
@@ -135,6 +153,8 @@ JSHG.resetVariables_ = function() {
     JSHG.learningCountDown_ = 0;
     JSHG.lastGesture_ = null;
     JSHG.handInfo_ = null;
+    // performance
+    JSHG.performance_ = {"nFrame": 0, "elapsed": 0, "lastTime": 0};
 }
 // generates a list of pixel points for learning skin color.
 JSHG.initLearningPoints_ = function() {
@@ -249,7 +269,9 @@ JSHG.showLearningCanvas_ = function() {
 }
 JSHG.hideLearningCanvas_ = function() {
     if (!JSHG.learningArea_) return;
-    JSHG.videoCanvas_.remove();
+    if (JSHG.settings_["debugMode"] == false) {
+        JSHG.videoCanvas_.remove();
+    }
     JSHG.learningMessage_.remove();
 }
 JSHG.showGestureCanvas_ = function() {
@@ -289,6 +311,17 @@ JSHG.readFrame_ = function() {
         try {
             JSHG.videoCanvasctx_.drawImage(JSHG.video_[0], 0, 0, JSHG.videoCanvas_[0].width, JSHG.videoCanvas_[0].height);
             var frame = JSHG.videoCanvasctx_.getImageData(0, 0, JSHG.videoCanvas_[0].width, JSHG.videoCanvas_[0].height);
+
+            if (JSHG.settings_["debugMode"]) {
+                // record performance
+                if (JSHG.performance_.nFrame > 0) {
+                    JSHG.performance_.elapsed += new Date().getTime() - JSHG.performance_.lastTime;
+                }
+                JSHG.performance_.nFrame++;
+                JSHG.performance_.lastTime = new Date().getTime();
+            }
+
+
             if (!JSHG.isLearning_) { // normal running mode
                 // skip frame if the worker is busy
                 if (!JSHG.isWorkerBusy_) {
@@ -443,6 +476,14 @@ JSHG.drawHandInfo_ = function() {
 
     // draw hand pos
     if (JSHG.handInfo_) {
+
+        if (JSHG.settings_["debugMode"]) {
+            debugInfo = JSHG.handInfo_.debugInfo;
+            drawContour([debugInfo.contour.contour], JSHG.gestureCanvasctx_, ["#FF0000"]);
+            drawLines(debugInfo.hullLines, JSHG.gestureCanvasctx_, ["#00FFFF"]);
+            drawLines(debugInfo.defectLines, JSHG.gestureCanvasctx_, ["#FF00FF"]);
+        }
+
         if (JSHG.handInfo_.handPos && JSHG.handInfo_.handPos.length == 2) {
             JSHG.gestureCanvasctx_.fillStyle = JSHG.settings_["colorHandPos"];
             var x = JSHG.handInfo_.handPos[0] * ratioW;
@@ -530,6 +571,9 @@ JSHG.run = function() {
         JSHG.resumeVideo_();
     }
     JSHG.showGestureCanvas_();
+    if (JSHG.settings_["debugMode"]) {
+        JSHG.showLearningCanvas_();
+    }
 }
 
 JSHG.learnSkinColor = function() {
@@ -553,8 +597,10 @@ JSHG.learnSkinColor = function() {
 JSHG.stop = function() {
     if (JSHG.video_ == null || JSHG.video_[0].paused) return;
 
-    JSHG.hideLearningCanvas_();
-    JSHG.hideGestureCanvas_();
+    if (JSHG.settings_["debugMode"] == false) {
+        JSHG.hideLearningCanvas_();
+        JSHG.hideGestureCanvas_();
+    }
 
     JSHG.video_[0].pause();
     compatibility.cancelAnimationFrame(JSHG.reqFrameReaderId_);
@@ -585,5 +631,12 @@ JSHG.delete = function() {
 
 JSHG.isRunning = function() {
     return JSHG.isRunning_;
+}
+
+JSHG.isInitialized = function() {
+    if (JSHG.grWorker_) {
+        return true;
+    }
+    return false;
 }
 
