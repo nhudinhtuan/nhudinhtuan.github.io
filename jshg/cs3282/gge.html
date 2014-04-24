@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<!--
+  Google Earth API
+  http://www.google.com/earth/
+  NUS & HCM - ParallelJS-CV
+-->
+<html>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <head>
+    <title>Gesture-driven Google Earth</title>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript" src="../gge/gEarthAPI.js"></script>
+    <script type="text/javascript" src="../jshg/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../jshg/compatibility.js"></script>
+    <script type="text/javascript" src="../jshg/jshg.js"></script>
+    <script type="text/javascript" src="../gge/index.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/pure-min.css">
+    <link rel="stylesheet" type="text/css" href="../gge/googleEarth.css" >
+  </head>
+  <body>
+    <div class="header">
+      <h1>Google Earth</h1>
+      <h2>lets you fly anywhere on Earth</h2>
+    </div>
+
+    <div class="content">
+      <div class="instruct-div">
+        <h3>INSTRUCTION</h3>
+        <a class="button-jshg button-start pure-button" onClick="learnSkin()" target="new">LEARN SKIN COLOR</a>
+        <a class="button-jshg button-start pure-button" id='jshgToggleBut' onClick="JSHGToggle($(this))" target="new">START JSHG</a>
+        <p><em><b>Open hand</b><em><br>
+            - Move Left: Pan East<br>
+            - Move Right: Pan West<br>
+            - Move Up: Pan North<br>
+            - Move Down: Pan South
+        </p>
+        <p><em><b>Close hand</b><em><br>
+            - Move Left: Zoom in<br>
+            - Move Right: Zoom Out
+        </p>
+        <p><em>Note: It is good to let JSHG learn your skin color before running!</em></p>
+      </div>
+      <div class="centerArea-div">
+        <div id='map3d'></div>
+        <div id='learningShownHere' class="learningArea"></div>
+      </div>
+      <div class='rightPanel-div' id="rightPanel">
+        <div id='gestureShownHere'></div>
+        <canvas id="controlsCanvas" width="240" height="200"></canvas>
+      </div>
+    </div>
+
+    <script type="text/javascript">
+      $(window).load(function() {
+        // init Google Earth
+        init();
+        // get mode canvas
+        controlsCanvas = $("#controlsCanvas");
+
+
+        var actionMapper = function(gesture) {
+            if (gesture.nFingers == 0) return;
+
+            if (gesture.nFingers < 3) {
+                // zoom mode
+                drawControlsCanvas(2, gesture.handPos);
+                if (gesture.isLeft && !gesture.isUp && !gesture.isDown) {
+                    zoomOut();
+                } else if (gesture.isRight && !gesture.isUp && !gesture.isDown) {
+                    zoomIn();
+                } else if (gesture.isUp && !gesture.isLeft && !gesture.isRight) {
+                    //
+                } else if (gesture.isDown && !gesture.isLeft && !gesture.isRight) {
+                    //
+                }
+            } else {
+                // pan mode
+                drawControlsCanvas(1, gesture.handPos);
+                if (gesture.isLeft && !gesture.isUp && !gesture.isDown) {
+                    panWest();
+                } else if (gesture.isRight && !gesture.isUp && !gesture.isDown) {
+                    panEast();
+                } else if (gesture.isUp && !gesture.isLeft && !gesture.isRight) {
+                    panNorth();
+                } else if (gesture.isDown && !gesture.isLeft && !gesture.isRight) {
+                    panSouth();
+                }
+            }
+        }
+        var finishLearning = function() {
+          $("#map3d").show();
+          $("#rightPanel").show();
+          $("#learningShownHere").hide();
+        }
+        JSHG.init({
+            "actionCallback": actionMapper, 
+            "learnCallback": finishLearning,
+            "learnDivId": "learningShownHere",
+            "gestureDivId": "gestureShownHere",
+            "settings": {
+              "learningCountDown": 10, 
+              "cameraWidth": 480, 
+              "cameraHeight": 400, 
+              "gestureDisplayWidth": 240, 
+              "gestureDisplayHeight": 200
+            },
+        });
+        $(window).unload(function() {
+           JSHG.stop();
+        });
+      });
+    </script>
+  </body>
+</html>

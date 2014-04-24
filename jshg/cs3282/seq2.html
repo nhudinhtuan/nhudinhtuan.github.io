@@ -1,0 +1,132 @@
+<html>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <head>
+    <title>JSHG Testing</title>
+    <script type="text/javascript" src="../jshg/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../jshg/ParallelJS-CV.min.js"></script>
+    <script type="text/javascript" src="../jshg/compatibility.js"></script>
+    <script type="text/javascript" src="../test/helper.js"></script>
+    <script type="text/javascript" src="./jshgseq2.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/pure-min.css">
+    <link rel="stylesheet" type="text/css" href="../test/index.css">
+  </head>
+  <body>
+    <div class="header">
+      <h1>JSHG - Single Thread 2</h1>
+      <h2>demo for single thread</h2>
+    </div>
+    <div class="content">
+      <h2 id="default-table" class="content-subhead">
+        Single Thread Demo on heavy task<br>
+        <a class="button-jshg button-start pure-button" id="startManualBut" onClick="runManualTest()">Run</a>
+        <a class="button-jshg button-stop pure-button" id="stopManualBut" onClick="stopManualTest()" style="display:none">Stop</a>
+        <a class="button-jshg button-start pure-button" id="learnManualBut" onClick="JSHG.learnSkinColor()" style="display:none">Learn</a>
+      </h2>
+      <div class="mannualTestArea">
+        <div id="webcameShownArea" style="float:left"></div>
+        <div id="gestureShownHere" style="float:right"></div>
+      </div>
+      <div class="reportArea">
+        <p id="performance"></p>
+        <p id="gestureReportMessage"></p>
+      </div>
+    </div>
+    <script>
+        function runManualTest() {
+            $("#startManualBut").hide();
+            $("#stopManualBut").show();
+            $("#learnManualBut").show();
+            var width = 420, height = 300;
+            var centralRatio = 1/3;
+            var nFrame = 0;
+            var elapsed = 0;
+            var lastTime = 0;
+            var actionReporter = function(gesture) {
+                if (nFrame > 0) {
+                    elapsed += new Date().getTime() - lastTime;
+                }
+                if (elapsed > 0) {
+                    var gestureFPS = Math.floor(nFrame/(elapsed/1000)) + " fps";
+                    var mainFPS = Math.floor(JSHG.performance_.nFrame/(JSHG.performance_.elapsed/1000)) + " fps";
+                    $("#performance").html("Main window runs at " + mainFPS + ", Gesture Recognizer runs at " + gestureFPS);
+                }
+                $("#gestureReportMessage").html("<pre><code>"+JSON.stringify(gesture, null, 4)+"</code></pre>");
+                lastTime = new Date().getTime();
+                nFrame++;
+            }
+            if (!JSHG.isInitialized()) {
+                JSHG.init({
+                    "actionCallback": actionReporter, 
+                    "learnDivId": "webcameShownArea",
+                    "gestureDivId": "gestureShownHere",
+                    "settings": {
+                        "cameraWidth": width,
+                        "cameraHeight": height,
+                        "gestureDisplayWidth": width,
+                        "gestureDisplayHeight": height,
+                        "centralAreaRatio": centralRatio,
+                        "learningCountDown": 5,
+                        "debugMode": true
+                    }
+                });
+            }
+            JSHG.run();
+        }
+
+        function stopManualTest() {
+            $("#startManualBut").show();
+            $("#stopManualBut").hide();
+            $("#learnManualBut").hide();
+            JSHG.stop();
+        }
+        function systemFlowTest() {
+            var count = 0;
+            var nTestCases = 10;
+            var width = 420, height = 300;
+            var centralRatio = 1/3;
+            var testCases = new Array(nTestCases)
+            testCases[0] = new JSHG.HandGesture(false, false, false, false, 0, [-1, -1]); // Unable to regconize
+            testCases[1] = new JSHG.HandGesture(true, false, true, false, 1, [0, 0]); // topLeft
+            testCases[2] = new JSHG.HandGesture(false, true, true, false, 2, [width, 0]); // topRight
+            testCases[3] = new JSHG.HandGesture(true, false, false, true, 3, [0, height]); // bottomLeft
+            testCases[4] = new JSHG.HandGesture(true, false, false, true, 4, [width, height]); // bottomRight
+            testCases[5] = new JSHG.HandGesture(false, false, false, false, 4, [width/2, height/2]); // middle point
+            testCases[6] = new JSHG.HandGesture(true, false, false, false, 5, [100, height/2]); // Left
+            testCases[7] = new JSHG.HandGesture(false, true, false, false, 5, [300, height/2]); // Right
+            testCases[8] = new JSHG.HandGesture(false, false, true, false, 5, [width/2, 90]); // Up
+            testCases[9] = new JSHG.HandGesture(false, false, false, true, 5, [width/2, 210]); // down
+            var systemFlowActionMapper = function(gesture) {
+                if (count >= nTestCases) {
+                    JSHG.delete();
+                    return;
+                }
+                console.log(gesture);
+                if (testCases[count].equals(gesture)) {
+                    $("#systemFlowTestResult").append("<font color='#4682B4'>Pass</font> test "+count+"<br>")
+                } else {
+                    $("#systemFlowTestResult").append("<font color='#8B0000'>Fail</font> test "+count+"<br>")
+                }
+                count++;    
+            }
+            if (JSHG.isInitialized()) {
+                stopManualTest();
+                JSHG.delete();
+            }
+            JSHG.init({
+                "actionCallback": systemFlowActionMapper, 
+                "learnDivId": "learnArea",
+                "settings": {
+                    "cameraWidth": width,
+                    "cameraHeight": height,
+                    "gestureDisplayWidth": width,
+                    "gestureDisplayHeight": height,
+                    "centralAreaRatio": centralRatio,
+                    "workerFilePath":"testworker.js"
+                }
+            });
+            JSHG.run();
+            $("#systemFlowTestResult").html("");
+        }
+    </script>
+  </body>
+</html>
