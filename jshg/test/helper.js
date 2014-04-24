@@ -42,7 +42,7 @@ function drawContour() {
 		} else {
 			(colorList == undefined) ? ctx.strokeStyle = "#000000" : ctx.strokeStyle = colorList[i];
 		}
-		ctx.lineWidth = 1
+		ctx.lineWidth = 2
 		if (widthList != undefined && widthList.length == 1) {
 			ctx.lineWidth = wdithList[0];
 		} else if (widthList != undefined && widthList.length > 1) {
@@ -79,7 +79,7 @@ function drawLines() {
 		} else {
 			(colorList == undefined) ? ctx.strokeStyle = "#000000" : ctx.strokeStyle = colorList[i];
 		}
-		ctx.lineWidth = 1
+		ctx.lineWidth = 2
 		if (widthList != undefined && widthList.length == 1) {
 			ctx.lineWidth = wdithList[0];
 		} else if (widthList != undefined && widthList.length > 1) {
