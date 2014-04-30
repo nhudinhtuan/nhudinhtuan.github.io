@@ -10,8 +10,11 @@ We provides a well-designed API for you to integrate JSHG to your application ea
 If you have strong background in computer vision, it is very simple for you to 
 customize JSHG according to your preference.
 
-**Note**: This plugin uses JSCV library which is developed by Intel, Harvey Mudd College and 
-National University of Singapore. 
+**Note**: 
+
+- This plugin uses JSCV library which is developed by Intel, Harvey Mudd College and National University of Singapore. 
+
+- This repo is created for CS3282 demo purposes only.
 
 Examples and Documentation
 -------------
@@ -25,6 +28,12 @@ http://nhudinhtuan.github.io/jshg/slides/
 
 2. Google Earth
 http://nhudinhtuan.github.io/jshg/gge/
+
+TEST CASES PAGE
+-------------
+
+A simple test system is developed for JSHG. It is available at 
+http://nhudinhtuan.github.io/jshg/test/
 
 FEEDBACK
 -------------
