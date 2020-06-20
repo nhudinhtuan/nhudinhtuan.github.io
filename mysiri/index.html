@@ -4,7 +4,7 @@
 	startBtn.innerHTML = "Start listening";
 	const result = document.createElement("div");
 	const processing = document.createElement("p");
-	document.write("<body><h1>My Siri</h1></body>");
+	document.write("<body><h1>My Siri</h1><p>Give it a try with 'hello', 'how are you', 'what's your name', 'what time is it', 'stop', ... </p></body>");
 	document.body.append(startBtn);
 	document.body.append(result);
 	document.body.append(processing);
@@ -55,27 +55,27 @@
 	}
 
 	// processor
-	function process(text) {
-		text = text.replace(/\s/g, "");
+	function process(orgintext) {
+		let text = orgintext.replace(/\s/g, "");
 		text = text.toLowerCase();
-		let response = "next question please!";
+		let response = null;
 		switch(text) {
 			case "hello":
-				response = "hi, how are you doing?";
-				break;
+				response = "hi, how are you doing?"; break;
 			case "what'syourname":
-				response = "My name's Siri.";
-				break;
+				response = "My name's Siri.";  break;
 			case "howareyou":
-				response = "I'm good."
-				break;
+				response = "I'm good."; break;
 			case "whattimeisit":
-				response = new Date().toLocaleTimeString();
-				break;
+				response = new Date().toLocaleTimeString(); break;
 			case "stop":
 				response = "Bye!!";
 				toggleBtn();
 				break;
+		}
+		if (!response) {
+			window.open('http://google.com/search?q='+orgintext.replace("search", ""), "_blank");
+			return "I found some information for " + orgintext;
 		}
 		return response;
 	}
