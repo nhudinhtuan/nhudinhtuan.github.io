@@ -13,7 +13,6 @@
 	const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 	let toggleBtn = null;
 	if (typeof SpeechRecognition === "undefined") {
-		alert("your browser does not support Web Speech API");
 		startBtn.remove();
 		result.innerHTML = "<b>Browser does not support Speech API. Please download latest chrome.<b>";
 	} else {
@@ -29,14 +28,14 @@
 
 	  			const response = process(text);
 	        	const p = document.createElement("p");
-	        	p.innerHTML = "YOU: " + text + "</br>SIRI: " + response;
+	        	p.innerHTML = `You said: ${text} </br>Siri said: ${response}`;
 	        	processing.innerHTML = "";
 				result.appendChild(p);
 
 				// read it out
 				speechSynthesis.speak(new SpeechSynthesisUtterance(response));
 			} else {
-				processing.innerHTML = "listening: " + text;
+				processing.innerHTML = `listening: ${text}`;
 			}
 		}
 		let listening = false;
@@ -71,11 +70,10 @@
 			case "stop":
 				response = "Bye!!";
 				toggleBtn();
-				break;
 		}
 		if (!response) {
-			window.open('http://google.com/search?q='+orgintext.replace("search", ""), "_blank");
-			return "I found some information for " + orgintext;
+			window.open(`http://google.com/search?q=${orgintext.replace("search", "")}`, "_blank");
+			return `I found some information for ${orgintext}`;
 		}
 		return response;
 	}
