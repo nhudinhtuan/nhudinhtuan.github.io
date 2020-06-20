@@ -26,10 +26,10 @@
 			if (res.isFinal) {
 				processing.innerHTML = "processing ....";
 
-	  			const response = process(text);
-	        	const p = document.createElement("p");
-	        	p.innerHTML = `You said: ${text} </br>Siri said: ${response}`;
-	        	processing.innerHTML = "";
+				const response = process(text);
+				const p = document.createElement("p");
+				p.innerHTML = `You said: ${text} </br>Siri said: ${response}`;
+				processing.innerHTML = "";
 				result.appendChild(p);
 
 				// read it out
@@ -41,21 +41,21 @@
 		let listening = false;
 		toggleBtn = () => {
 			if (listening) {
-        		recognition.stop();
+				recognition.stop();
 				startBtn.textContent = "Start listening";
-        	} else {
-        		recognition.start();
+			} else {
+				recognition.start();
 				startBtn.textContent = "Stop listening";
-        	}
-        	listening = !listening;
-     	};
+			}
+			listening = !listening;
+		};
 		startBtn.addEventListener("click", toggleBtn);
 
 	}
 
 	// processor
-	function process(orgintext) {
-		let text = orgintext.replace(/\s/g, "");
+	function process(rawText) {
+		let text = rawText.replace(/\s/g, "");
 		text = text.toLowerCase();
 		let response = null;
 		switch(text) {
@@ -72,8 +72,8 @@
 				toggleBtn();
 		}
 		if (!response) {
-			window.open(`http://google.com/search?q=${orgintext.replace("search", "")}`, "_blank");
-			return `I found some information for ${orgintext}`;
+			window.open(`http://google.com/search?q=${rawText.replace("search", "")}`, "_blank");
+			return `I found some information for ${rawText}`;
 		}
 		return response;
 	}
